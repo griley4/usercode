@@ -38,8 +38,21 @@ process.patMuonAnalyzer = cms.EDProducer(
                                 ),
                         )  
                 )
+process.patJpsiAnalyzer = cms.EDProducer(
+                "CandViewNtpProducer",
+                src = cms.InputTag("JPsiToMuMu"),
+                lazyParser = cms.untracked.bool(True),
+                prefix = cms.untracked.string(""),
+                eventInfo = cms.untracked.bool(True),
+                variables = cms.VPSet(
+                        cms.PSet(
+                                tag = cms.untracked.string("mass"),
+                                quantity = cms.untracked.string("mass")
+                                ),
+                        )
+                )
 
-process.p = cms.Path(process.patMuonAnalyzer )
+process.p = cms.Path(process.patMuonAnalyzer * process.patJpsiAnalyzer)
 
 process.out = cms.OutputModule("PoolOutputModule",
                 fileName = cms.untracked.string('edmTuple.root'),
@@ -47,7 +60,7 @@ process.out = cms.OutputModule("PoolOutputModule",
                 SelectEvents   = cms.untracked.PSet( SelectEvents = cms.vstring('p') ),
                 # save PAT Layer 1 output; you need a '*' to
                 # unpack the list of commands 'patEventContent'
-                outputCommands = cms.untracked.vstring('drop *', 'keep *_patMuonAnalyzer_*_*')
+                outputCommands = cms.untracked.vstring('drop *', 'keep *_patMuonAnalyzer_*_*', 'keep *_patJpsiAnalyzer_*_*')
                 )
 
 process.outpath = cms.EndPath(process.out)
