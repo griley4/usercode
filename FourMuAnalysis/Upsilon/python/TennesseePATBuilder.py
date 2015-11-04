@@ -16,10 +16,21 @@ process.source = cms.Source("PoolSource",
                         )
                 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
-process.GlobalTag.globaltag = cms.string('FT_53_V21_AN3::All')
+process.GlobalTag.globaltag = cms.string('FT_53_V21_AN6::All')
 #remove MC Matching for Real data
 from PhysicsTools.PatAlgos.tools.coreTools import *
 removeMCMatching(process, names=['All'],outputModules=[])
+from PhysicsTools.PatAlgos.tools.jetTools import *
+switchJetCollection(process, 
+                    cms.InputTag('ak5PFJets'),   
+#                    doJTA            = True,
+#                    doBTagging       = True,
+                    jetCorrLabel     = ('AK5PF', ['L2Relative', 'L3Absolute']),
+#                    doType1MET       = False,
+                    genJetCollection = cms.InputTag("ak5GenJets"),
+#                    doJetID          = True,
+                    jetIdLabel       = "ak5",
+                    outputModules    = [])
 # switch on PAT trigger info
 from PhysicsTools.PatAlgos.tools.trigTools import *
 switchOnTrigger( process )
@@ -43,6 +54,7 @@ process.goodMuons = cms.EDFilter("PATMuonSelector",
                 src = cms.InputTag("patMuons"),
 #                cut = cms.string(''),
                 cut = cms.string("track.isNonnull && track.hitPattern.pixelLayersWithMeasurement > 0 ")
+
                 )
 process.makeGoodMuons = cms.Path(process.goodMuons)
 process.UpsCand = cms.EDProducer("CandViewShallowCloneCombiner",
@@ -67,11 +79,11 @@ process.pat = cms.Path(
 
 #produce output
 
-process.out = cms.OutputModule("PoolOutputModule", fileName = cms.untracked.string('MuOnia_Run2012A_22Jan2013-v1_HLT_JpsiORUpsilon_Oct2015Skim.root'),
+process.out = cms.OutputModule("PoolOutputModule", fileName = cms.untracked.string('MuOnia_Run2012D_22Jan2013-v1_HLT_JpsiORUpsilon_Oct2015Skim.root'),
 ## save only events passing the full path
                 SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring("TrigSkim") ),
                 ## save PAT output; you need a '*' to unpack the list of commands
-#                outputCommands = cms.untracked.vstring('drop *', 'keep *reco*', 'keep *pat*', 'keep *hlt*')
+                outputCommands = cms.untracked.vstring('drop *', 'keep *_*_*_HLT', 'keep *L1*_*_*_*', 'keep *Trig*_*_*_*', 'keep *_*muons*_*_*', 'keep *_*Muons*_*_*', 'keep *_*Track*_*_*', 'keep *CompositeCandidate*_*_*_*')
 
 
                 )
