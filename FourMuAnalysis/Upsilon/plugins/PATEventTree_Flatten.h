@@ -68,16 +68,14 @@ class PATEventTree : public edm::EDAnalyzer {
   void fillHLTPath(const unsigned int psSet, const edm::Handle<edm::TriggerResults>& hHLTresults, const trigger::TriggerEvent& triggerEvent);
   void fillHLT(const pat::TriggerObjectStandAloneCollection& HLTObjects);
   void fillPrimaryVertices(const std::vector<Vertex>& vertices);
-  void fillParticles(const std::vector<pat::Muon>& muons, const std::vector<pat::Electron>& electrons, const std::vector<pat::Photon>& photons, const std::vector<reco::Track>& ctftracks);
+  void fillParticles(const std::vector<pat::Muon>& muons, const std::vector<reco::Track>& ctftracks);
   void fillJets(const std::vector<pat::Jet>& jets);
   void jetDisambiguation();
   void fillSecondaryVertices(const reco::SecondaryVertexTagInfo& svTagInfo, const bool IsGTV);
   void fillMET(const pat::METCollection& METColl);
   void fillGen(const std::vector<GenParticle>& genparticles);
-  void fillJPsiMuMuCand(const reco::CompositeCandidateCollection& JPsiCands, const reco::MuonRefVector& goodMuons, std::vector<TransientTrack>& t_tks);
-  void makeJPsiMuTkCand(const reco::MuonRefVector& goodMuons, const std::vector<reco::Track>& ctftracks, std::vector<TransientTrack>& t_tks);
+  void fillDimuonCand(const reco::CompositeCandidateCollection& JPsiCands, const reco::MuonRefVector& goodMuons, std::vector<TransientTrack>& t_tks);
   void makeEtabCand(std::vector<TransientTrack>& t_tks);
-  void makeHiggsCand(const int startJet, const int endJet);
   void fillTopology();
   bool isProgenitor(const int putativeMom, const int putativeKid);
   bool isDescendant(const int putativeMom, const int putativeKid);
@@ -85,7 +83,7 @@ class PATEventTree : public edm::EDAnalyzer {
  private:
   std::string     fRootFileName;
   bool            fHLT_Skim, fIsEtabJPsi, fIsJPsiMuMu, fIsHBB, fIsMC, fUseFatJets;
-  edm::InputTag   fHLTPathLabel, fHLTFilterLabel, fHLTCollectionLabel, fPrimaryVertexCollectionLabel, fMuonCollectionLabel, fElectronCollectionLabel, fPhotonCollectionLabel, fTrackCollectionLabel, fJetCollectionLabel, fMETCollectionLabel, fGenCollectionLabel, fJPsiCandLabel, fJPsiInputLabel;
+  edm::InputTag   fHLTPathLabel, fHLTFilterLabel, fHLTCollectionLabel, fPrimaryVertexCollectionLabel, fMuonCollectionLabel, fElectronCollectionLabel, fPhotonCollectionLabel, fTrackCollectionLabel, fJetCollectionLabel, fMETCollectionLabel, fGenCollectionLabel,fFourmuonCandLabel, fDimuonCandLabel, fDimuonInputLabel;
   std::vector<edm::InputTag> fFatJetCollectionLabel;
   edm::ESHandle<TransientTrackBuilder> theBuilder;
 
