@@ -39,12 +39,10 @@ process.TrigSkim = cms.Path(process.triggerSelection)
 #make J/Psi cands from muons
 ##Add Muon candidates
 from PhysicsTools.PatAlgos.tools.muonTools import *
-<<<<<<< HEAD
 process.goodMuons = cms.EDFilter("PATMuonSelector",
                 src = cms.InputTag("patMuons"),
 #                cut = cms.string(''),
                 cut = cms.string("track.isNonnull && track.hitPattern.pixelLayersWithMeasurement > 0 ")
-
                 )
 process.makeGoodMuons = cms.Path(process.goodMuons)
 process.UpsCand = cms.EDProducer("CandViewShallowCloneCombiner",

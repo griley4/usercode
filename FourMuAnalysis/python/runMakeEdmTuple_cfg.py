@@ -13,46 +13,15 @@ process.MessageLogger = cms.Service("MessageLogger")
 
 ## ---
 ## This is an example of the use of the plain edm::Tuple dumper to analyze pat::Muons
-process.patMuonAnalyzer = cms.EDProducer(
-                "CandViewNtpProducer", 
-                src = cms.InputTag("patMuons"),
-                lazyParser = cms.untracked.bool(True),
-                prefix = cms.untracked.string(""),
-                eventInfo = cms.untracked.bool(True),
-                variables = cms.VPSet(
-                        cms.PSet(
-                                tag = cms.untracked.string("pt"),
-                                quantity = cms.untracked.string("pt")
-                                ),
-                        cms.PSet(
-                                tag = cms.untracked.string("energy"),
-                                quantity = cms.untracked.string("energy")
-                                ),
-                        cms.PSet(
-                                tag = cms.untracked.string("eta"),
-                                quantity = cms.untracked.string("eta")
-                                ),
-                        cms.PSet(
-                                tag = cms.untracked.string("phi"),
-                                quantity = cms.untracked.string("phi")
-                                ),
-                        )  
-                )
-process.patJpsiAnalyzer = cms.EDProducer(
-                "CandViewNtpProducer",
-                src = cms.InputTag("JPsiToMuMu"),
-                lazyParser = cms.untracked.bool(True),
-                prefix = cms.untracked.string(""),
-                eventInfo = cms.untracked.bool(True),
-                variables = cms.VPSet(
-                        cms.PSet(
-                                tag = cms.untracked.string("mass"),
-                                quantity = cms.untracked.string("mass")
-                                ),
-                        )
-                )
+process.edmEventTreeMaker = cms.EDAnalyzer("edmEventTree",
+                rootFileName      = cms.untracked.string("MuOnia_2012_Data.root"),
+                MuonCollectionLabel   = cms.untracked.InputTag('patMuons'),
+                goodMuonInputLabel    = cms.untracked.InputTag('goodMuons'),
+                DiMuCandLabel         = cms.untracked.InputTag('DiMuCand'),
+                UpsCandLabel          = cms.untracked.InputTag('UpsCand'),
+                FourMuCandLabel       = cms.untracked.InputTag('FourMuCand')
 
-process.p = cms.Path(process.patMuonAnalyzer * process.patJpsiAnalyzer)
+process.p = cms.Path(process.edmEventTreeMaker)
 
 process.out = cms.OutputModule("PoolOutputModule",
                 fileName = cms.untracked.string('edmTuple.root'),
