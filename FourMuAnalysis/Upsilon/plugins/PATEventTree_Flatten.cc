@@ -181,6 +181,10 @@ void PATEventTree::beginJob() {
   fTree->Branch("MuHLTMatch",   fMuHLTMatch,    "MuHLTMatch[MuN][2]/O");
   fTree->Branch("MuL3Match",    fMuL3Match,     "MuL3Match[MuN]/O");
   fTree->Branch("MuTightMatch", fMuTightMatch,  "MuTightMatch[MuN]/O");
+  fTree->Branch("MuIsHighPurity",fMuIsHighPurity,"MuIsHighPurity[MuN]/O");
+  fTree->Branch("goodSoftMuon",fgoodSoftMuon,"goodSoftMuon[MuN]/O");
+  fTree->Branch("goodSoftMuonMod",fgoodSoftMuonMod,"goodSoftMuonMod[MuN]/O");
+  fTree->Branch("goodTightMuon",fgoodTightMuon,"goodTightMuon[MuN]/O");
 
   fTree->Branch("PcToJt",       fPcToJt,        "PcToJt[PcN][5]/I");
 
@@ -513,7 +517,6 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   if ( muonHandle.isValid() && ctfTrackHandle.isValid() ) fillParticles( *(muonHandle.product()), *(ctfTrackHandle.product()) );
   else { cout << "--> Missing valid particle collection" << endl; }
 	
-	if (fgsmmN<4){continue}
   // determine track IP
   for (Int_t itk=0; itk<fTkN; itk++) {
     float x1, y1, z1;
@@ -554,7 +557,9 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   // ----------------------------------------------------------------------
   if ( fJPsiN>1 ) makeEtabCand( t_tks );
 
-  fTree->Fill();
+	if (fgsmmN>=4){
+    fTree->Fill();
+  }
 }
 
 
@@ -675,7 +680,7 @@ void PATEventTree::init() {
     }
   }
 
-  fPvN = fRePvN = fAllPvN = fHLTN = fPcN = fTkN = fMuN = fElecN = fMiscTkN = fPhotN = JtShift = fJtN = fJtStandN = fJtFatN = fJtSubN = fJtFiltN = fMETN = fSvN = fSsvN = fGtvN = fJPsiN = fEtabN = fHN = fGnN = fGnBN = fJtBdRN = fJtBFlavN = fgsmN = fgsmnN = fgtmN = 0;
+  fPvN = fRePvN = fAllPvN = fHLTN = fPcN = fTkN = fMuN = fElecN = fMiscTkN = fPhotN = JtShift = fJtN = fJtStandN = fJtFatN = fJtSubN = fJtFiltN = fMETN = fSvN = fSsvN = fGtvN = fJPsiN = fEtabN = fHN = fGnN = fGnBN = fJtBdRN = fJtBFlavN = fgsmN = fgsmmN = fgtmN = 0;
 
 }
 
@@ -1117,7 +1122,7 @@ void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std:
     fMu2DCompatibilityTight[fMuN] = muons[fMuN].muonID("TM2DCompatibilityTight");
     fMuOneStationLoose[fMuN] = muons[fMuN].muonID("TMOneStationLoose");
     fMuOneStationTight[fMuN] = muons[fMuN].muonID("TMOneStationTight");
-		fMuIsHighPurity[fMuN] = muons[fMuN].quality(reco::TrackBase::highPurity);
+		fMuIsHighPurity[fMuN] = ctftracks[TkI].quality(reco::TrackBase::highPurity);
 		
     // global fit info
     if( muons[fMuN].globalTrack().isNonnull() ) {
@@ -1157,10 +1162,10 @@ void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std:
 		if (fMuIsGlobal[fMuN]
 				&& muons[fMuN].isPFMuon()
 				&& fMuChi2[fMuN] < 2
-				&& muons[fMuN].globalTrack().hitPattern().numberOfValidMuonHits()>0
+				&& muons[fMuN].globalTrack()->hitPattern().numberOfValidMuonHits()>0
 				&& muons[fMuN].numberOfMatchedStations()>1
-				&& fabs(muons[fMuN].muonBestTrack().dxy( RefVtx)) < 0.2
-				&& fabs(muons[fMuN].muonBestTrack().dz( RefVtx)) < 0.5
+				&& fabs(muons[fMuN].muonBestTrack()->d0()) < 0.2
+				&& fabs(muons[fMuN].muonBestTrack()->dz()) < 0.5
 				&& fPcPixHitN[fPcN] > 0 
 				&& fPcStripLayN[fPcN] > 5 )
 				{fgoodTightMuon[fMuN] = 1; fgtmN++;}
