@@ -122,7 +122,7 @@ class PATEventTree : public edm::EDAnalyzer {
 
   // -- Particles
   static const int PARTMAX = 10000;
-  int   fPcN, fTkN, fMuN, fElecN, fMiscTkN, fPhotN; //fHadrN, 
+  int   fPcN, fTkN, fMuN, fElecN, fMiscTkN, fPhotN, fgsmN, fgsmmN,fgtmN ; //fHadrN, 
   int   fPcIndex[PARTMAX], fMuIndex[PARTMAX], fElecIndex[PARTMAX], fMiscTkIndex[PARTMAX], fPhotIndex[PARTMAX], fPcToGn[PARTMAX], fPcToTk[PARTMAX], fTkToPc[PARTMAX], fPcToPv[PARTMAX], fPcTkQuality[PARTMAX], fPcJtN[PARTMAX], fPcPdgId[PARTMAX], fPcPixHitN[PARTMAX], fPcPixLayN[PARTMAX], fPcStripHitN[PARTMAX], fPcStripLayN[PARTMAX]; //fHadrIndex[PARTMAX]
   float fPcCharge[PARTMAX], fPcChi2[PARTMAX], fPcNdof[PARTMAX], fPcEnergy[PARTMAX], fPcEt[PARTMAX], fPcP[PARTMAX], fPcPt[PARTMAX], fPcPx[PARTMAX], fPcPy[PARTMAX], fPcPz[PARTMAX], fPcTheta[PARTMAX], fPcEta[PARTMAX], fPcPhi[PARTMAX], fPcD0[PARTMAX], fPcDz[PARTMAX], fPcEtaErr[PARTMAX], fPcPhiErr[PARTMAX], fPcD0Err[PARTMAX], fPcDzErr[PARTMAX], fPcVx[PARTMAX], fPcVy[PARTMAX], fPcVz[PARTMAX], fPcEcalIso[PARTMAX], fPcHcalIso[PARTMAX], fPcTrackIso[PARTMAX], fPcIP[PARTMAX], fPcIPxy[PARTMAX];
   // -- muons
@@ -130,7 +130,7 @@ class PATEventTree : public edm::EDAnalyzer {
 //  IntMatrix fMuChambers[PARTMAX]; 
   int   fMuHitN[PARTMAX], fMuMatchedN[PARTMAX], fMuMatchedNSegArb[PARTMAX],fMuMatchedNSegTrkArb[PARTMAX],fMuMatchedNSegTrkArbClean[PARTMAX],fMuHLTN[PARTMAX], fMuToHLT[PARTMAX];
   float fMuChi2[PARTMAX], fMuNdof[PARTMAX], fMuTkKink[PARTMAX], fMuGlbKink[PARTMAX], fMuGlbProb[PARTMAX], fMuTkSADist[PARTMAX], fMuTkSAdR[PARTMAX], fMuECALEnergy[PARTMAX], fMuHCALEnergy[PARTMAX], fMuCalCompat[PARTMAX];
-  bool  fMuIsGlobal[PARTMAX], fMuIsTracker[PARTMAX], fMuIsStandalone[PARTMAX], fMuIsCalo[PARTMAX], fMuArbitrated[PARTMAX], fMuLastStationLoose[PARTMAX], fMuLastStationTight[PARTMAX], fMu2DCompatibilityLoose[PARTMAX], fMu2DCompatibilityTight[PARTMAX], fMuOneStationLoose[PARTMAX], fMuOneStationTight[PARTMAX], fMuHLTMatch[PARTMAX][2], fMuL3Match[PARTMAX], fMuTightMatch[PARTMAX];
+  bool  fMuIsGlobal[PARTMAX], fMuIsTracker[PARTMAX], fMuIsStandalone[PARTMAX], fMuIsCalo[PARTMAX], fMuArbitrated[PARTMAX], fMuLastStationLoose[PARTMAX], fMuLastStationTight[PARTMAX], fMu2DCompatibilityLoose[PARTMAX], fMu2DCompatibilityTight[PARTMAX], fMuOneStationLoose[PARTMAX], fMuOneStationTight[PARTMAX], fMuHLTMatch[PARTMAX][2], fMuL3Match[PARTMAX], fMuTightMatch[PARTMAX], fMuIsHighPurity[PARTMAX], fgoodSoftMuon[PARTMAX], fgoodSoftMuonMod[PARTMAX], fgoodTightMuon[PARTMAX] ;
 
   // -- Primary Vertices
   static const int PVMAX = 300;
