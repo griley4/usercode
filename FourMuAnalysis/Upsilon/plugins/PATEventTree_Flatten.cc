@@ -1492,19 +1492,13 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
 
         // find CT and CTxy
         if( fPvX[0]!=-9999 ) {
-          float xvecX, xvecY, xvecZ, pvecX, pvecY, pvecZ;
+          float xvecX, xvecY, xvecZ;
           xvecX = fEtabVx[fEtabN]-fPvX[0];
           xvecY = fEtabVy[fEtabN]-fPvY[0];
           xvecZ = fEtabVz[fEtabN]-fPvZ[0];
-          pvecX = fEtabPx[fEtabN];
-          pvecY = fEtabPy[fEtabN];
-          pvecZ = fEtabPz[fEtabN];
           fEtabCTxy[fEtabN] = (xvecX*fEtabPx[fEtabN]+xvecY*fEtabPy[fEtabN])/fEtabPt[fEtabN];
           fEtabCT[fEtabN] = (xvecX*fEtabPx[fEtabN]+xvecY*fEtabPy[fEtabN]+xvecZ*fEtabPz[fEtabN])/fEtabP[fEtabN];
           // using vtx kinematics
-          pvecX = fEtabVtxPx[fEtabN];
-          pvecY = fEtabVtxPy[fEtabN];
-          pvecZ = fEtabVtxPz[fEtabN];
           fEtabVtxCTxy[fEtabN] = (xvecX*fEtabVtxPx[fEtabN]+xvecY*fEtabVtxPy[fEtabN])/fEtabVtxPt[fEtabN];
           fEtabVtxCT[fEtabN] = (xvecX*fEtabVtxPx[fEtabN]+xvecY*fEtabVtxPy[fEtabN]+xvecZ*fEtabVtxPz[fEtabN])/fEtabVtxP[fEtabN];
 	}

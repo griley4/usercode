@@ -83,7 +83,7 @@ class PATEventTree : public edm::EDAnalyzer {
  private:
   std::string     fRootFileName;
   bool            fHLT_Skim, fIsEtabJPsi, fIsJPsiMuMu, fIsHBB, fIsMC, fUseFatJets;
-  edm::InputTag   fHLTPathLabel, fHLTFilterLabel, fHLTCollectionLabel, fPrimaryVertexCollectionLabel, fMuonCollectionLabel, fElectronCollectionLabel, fPhotonCollectionLabel, fTrackCollectionLabel, fJetCollectionLabel, fMETCollectionLabel, fGenCollectionLabel,fFourmuonCandLabel, fDimuonCandLabel, fDimuonInputLabel;
+  edm::InputTag   fHLTPathLabel, fHLTFilterLabel, fHLTCollectionLabel, fPrimaryVertexCollectionLabel, fMuonCollectionLabel, fElectronCollectionLabel, fPhotonCollectionLabel, fTrackCollectionLabel, fJetCollectionLabel, fMETCollectionLabel, fGenCollectionLabel,fDimuonCandLabel, fFourmuonCandLabel,fDimuonInputLabel;
   std::vector<edm::InputTag> fFatJetCollectionLabel;
   edm::ESHandle<TransientTrackBuilder> theBuilder;
 
