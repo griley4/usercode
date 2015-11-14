@@ -122,7 +122,7 @@ class PATEventTree : public edm::EDAnalyzer {
 
   // -- Particles
   static const int PARTMAX = 10000;
-  int   fPcN, fTkN, fMuN, fElecN, fMiscTkN, fPhotN, fgsmN, fgsmmN,fgtmN ; //fHadrN, 
+  int   fPcN, fTkN, fMuN, fElecN, fMiscTkN, fPhotN, fgsmN, fgsmmN,fgtmN, bestProb ; //fHadrN, 
   int   fPcIndex[PARTMAX], fMuIndex[PARTMAX], fElecIndex[PARTMAX], fMiscTkIndex[PARTMAX], fPhotIndex[PARTMAX], fPcToGn[PARTMAX], fPcToTk[PARTMAX], fTkToPc[PARTMAX], fPcToPv[PARTMAX], fPcTkQuality[PARTMAX], fPcJtN[PARTMAX], fPcPdgId[PARTMAX], fPcPixHitN[PARTMAX], fPcPixLayN[PARTMAX], fPcStripHitN[PARTMAX], fPcStripLayN[PARTMAX]; //fHadrIndex[PARTMAX]
   float fPcCharge[PARTMAX], fPcChi2[PARTMAX], fPcNdof[PARTMAX], fPcEnergy[PARTMAX], fPcEt[PARTMAX], fPcP[PARTMAX], fPcPt[PARTMAX], fPcPx[PARTMAX], fPcPy[PARTMAX], fPcPz[PARTMAX], fPcTheta[PARTMAX], fPcEta[PARTMAX], fPcPhi[PARTMAX], fPcD0[PARTMAX], fPcDz[PARTMAX], fPcEtaErr[PARTMAX], fPcPhiErr[PARTMAX], fPcD0Err[PARTMAX], fPcDzErr[PARTMAX], fPcVx[PARTMAX], fPcVy[PARTMAX], fPcVz[PARTMAX], fPcEcalIso[PARTMAX], fPcHcalIso[PARTMAX], fPcTrackIso[PARTMAX], fPcIP[PARTMAX], fPcIPxy[PARTMAX];
   // -- muons
@@ -188,16 +188,17 @@ class PATEventTree : public edm::EDAnalyzer {
   int fJPsiN, fJPsiMuMuN, fJPsiMuTkN, fBaseJPsiI[2];
   int fJPsiIndex[JPsiMAX], fJPsiClosestPVinZ[JPsiMAX], fJPsiMuI[JPsiMAX][2], fJPsiMuCategory[JPsiMAX][2];
   float fJPsiCharge[JPsiMAX], fJPsiPhi[JPsiMAX], fJPsiTheta[JPsiMAX], fJPsiEta[JPsiMAX], fJPsiRapidity[JPsiMAX], fJPsiP[JPsiMAX], fJPsiPt[JPsiMAX], fJPsiPx[JPsiMAX], fJPsiPy[JPsiMAX], fJPsiPz[JPsiMAX], fJPsiEnergy[JPsiMAX], fJPsiEt[JPsiMAX], fJPsiMass[JPsiMAX], fJPsiMt[JPsiMAX], fJPsiChi2[JPsiMAX], fJPsiNdof[JPsiMAX], fJPsiVx[JPsiMAX], fJPsiVy[JPsiMAX], fJPsiVz[JPsiMAX], fJPsiVxE[JPsiMAX], fJPsiVyE[JPsiMAX], fJPsiVzE[JPsiMAX], fJPsiVtxPhi[JPsiMAX], fJPsiVtxTheta[JPsiMAX], fJPsiVtxEta[JPsiMAX], fJPsiVtxRapidity[JPsiMAX], fJPsiVtxP[JPsiMAX], fJPsiVtxPt[JPsiMAX], fJPsiVtxPx[JPsiMAX], fJPsiVtxPy[JPsiMAX], fJPsiVtxPz[JPsiMAX], fJPsiVtxEnergy[JPsiMAX], fJPsiVtxEt[JPsiMAX], fJPsiVtxMass[JPsiMAX], fJPsiVtxMt[JPsiMAX];
-  bool fJPsiMuCutKin[JPsiMAX][2], fJPsiMuCutHLT[JPsiMAX][2], fJPsiMuCutIso[JPsiMAX][2], fJPsiMuCutSA[JPsiMAX][2], fJPsiMuCutTrk[JPsiMAX][2], fJPsiMuType[JPsiMAX][2][5];
+  bool fJPsiMuCutKin[JPsiMAX][2], fJPsiMuCutHLT[JPsiMAX][2], fJPsiMuCutIso[JPsiMAX][2], fJPsiMuCutSA[JPsiMAX][2], fJPsiMuCutTrk[JPsiMAX][2], fJPsiMuType[JPsiMAX][2][5], fJPsiBasicFilter[JPsiMAX];
 
   // -- Eta_b->2 J/Psi candidates
   static const int ETABMAX = 200;
 
-  int fEtabN, fBaseEtabI;
+  int fEtabN, fBaseEtabI, EtabBestVtxProbI;
   int fEtabIndex[ETABMAX], fEtabDuplicatesI[ETABMAX], fEtabJPsiI[ETABMAX][2], fEtabMuI[ETABMAX][4], fEtabMuN[ETABMAX], fEtabToRePvI[ETABMAX];
   float fEtabCharge[ETABMAX], fEtabPhi[ETABMAX], fEtabTheta[ETABMAX], fEtabEta[ETABMAX], fEtabRapidity[ETABMAX], fEtabP[ETABMAX], fEtabPt[ETABMAX], fEtabPx[ETABMAX], fEtabPy[ETABMAX], fEtabPz[ETABMAX], fEtabEnergy[ETABMAX], fEtabEt[ETABMAX], fEtabMass[ETABMAX], fEtabMt[ETABMAX], fEtabChi2[ETABMAX], fEtabNdof[ETABMAX], fEtabVx[ETABMAX], fEtabVy[ETABMAX], fEtabVz[ETABMAX], fEtabVxE[ETABMAX], fEtabVyE[ETABMAX], fEtabVzE[ETABMAX], fEtabVtxPhi[ETABMAX], fEtabVtxTheta[ETABMAX], fEtabVtxEta[ETABMAX], fEtabVtxRapidity[ETABMAX], fEtabVtxP[ETABMAX], fEtabVtxPt[ETABMAX], fEtabVtxPx[ETABMAX], fEtabVtxPy[ETABMAX], fEtabVtxPz[ETABMAX], fEtabVtxEnergy[ETABMAX], fEtabVtxEt[ETABMAX], fEtabVtxMass[ETABMAX], fEtabVtxMt[ETABMAX], fEtabCT[ETABMAX], fEtabCTxy[ETABMAX], fEtabVtxCT[ETABMAX], fEtabVtxCTxy[ETABMAX], fEtabJPsiDeltaL[ETABMAX], fEtabJPsiDeltaT[ETABMAX], fEtabJPsiVtxErr[ETABMAX], fEtabJPsiVtxErrxy[ETABMAX], fEtabJPsiProjX[ETABMAX][2], fEtabJPsiProjY[ETABMAX][2], fEtabJPsiProjZ[ETABMAX][2], fEtabJPsiCT[ETABMAX][2], fEtabJPsiCTxy[ETABMAX][2], fEtabJPsiToPVVtxErr[ETABMAX][2], fEtabJPsiToPVVtxErrxy[ETABMAX][2], fEtabJPsiVtxCT[ETABMAX][2], fEtabJPsiVtxCTxy[ETABMAX][2];
+  bool fEtabBasicFilter[ETABMAX];
   // isolation information
-  int fEtabJPsiIsoTkN[ETABMAX][2];
+  int fEtabJPsiIsoTkN[ETABMAX][2], fEtabBestVtxProbI;
   float fEtabJPsiIso7PV[ETABMAX][2], fEtabJPsiIsoTkCA[ETABMAX][2];
 
   // -- H->bb candidates

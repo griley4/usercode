@@ -150,7 +150,7 @@ void PATEventTree::beginJob() {
   fTree->Branch("PcIP",         fPcIP,          "PcIP[PcN]/F");
   fTree->Branch("PcIPxy",       fPcIPxy,        "PcIPxy[PcN]/F");
   fTree->Branch("MuHitN",       fMuHitN,        "MuHitN[MuN]/I");
-//  fTree->Branch("MuChambers",	&fMuChambers,	"MuChambers[MuN]/I");
+  //  fTree->Branch("MuChambers",	&fMuChambers,	"MuChambers[MuN]/I");
   fTree->Branch("MuMatchedN",   fMuMatchedN,    "MuMatchedN[MuN]/I");
   fTree->Branch("MuMatchedNSegArb",   fMuMatchedNSegArb,    "MuMatchedNSegArb[MuN]/I");
   fTree->Branch("MuMatchedNSegTrkArb",   fMuMatchedNSegTrkArb,    "MuMatchedNSegTrkArb[MuN]/I");
@@ -256,6 +256,7 @@ void PATEventTree::beginJob() {
   fTree->Branch("JPsiVtxMt",       fJPsiVtxMt,        "JPsiVtxMt[JPsiN]/F");
 
   fTree->Branch("JPsiMuI",         fJPsiMuI,          "JPsiMuI[JPsiN][2]/I");
+  fTree->Branch("JPsiBasicFilter", fJPsiBasicFilter,	"JPsiBasicFilter[JPsiN]/O");
   fTree->Branch("JPsiMuCategory",  fJPsiMuCategory,   "JPsiMuCategory[JPsiN][2]/I");
   fTree->Branch("JPsiMuCutKin",    fJPsiMuCutKin,     "JPsiMuCutKin[JPsiN][2]/O");
   fTree->Branch("JPsiMuCutHLT",    fJPsiMuCutHLT,     "JPsiMuCutHLT[JPsiN][2]/O");
@@ -302,7 +303,8 @@ void PATEventTree::beginJob() {
   fTree->Branch("EtabVtxEt",    fEtabVtxEt,     "EtabVtxEt[EtabN]/F");
   fTree->Branch("EtabVtxMass",  fEtabVtxMass,   "EtabVtxMass[EtabN]/F");
   fTree->Branch("EtabVtxMt",    fEtabVtxMt,     "EtabVtxMt[EtabN]/F");
-
+  fTree->Branch("EtabBestVtxProbI",fEtabBestVtxProbI,"EtabBestVtxProbI/I");
+  fTree->Branch("EtabBasicFilter", fEtabBasicFilter, "EtabBasicFilter[EtabN]/O");
   fTree->Branch("BaseEtabI",    &fBaseEtabI,    "BaseEtabI/I");
   fTree->Branch("EtabJPsiI",    fEtabJPsiI,     "EtabJPsiI[EtabN][2]/I");
   fTree->Branch("EtabMuI",      fEtabMuI,       "EtabMuI[EtabN][4]/I");
@@ -386,7 +388,7 @@ void PATEventTree::endRun(Run const &run, EventSetup const&iSetup) {
 
 // ----------------------------------------------------------------------
 void PATEventTree::analyze(const edm::Event& iEvent,
-			const edm::EventSetup& iSetup) {
+    const edm::EventSetup& iSetup) {
 
   // ----------------------------------------------------------------------
   // -- Get collections of event information
@@ -476,9 +478,9 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   //to cout all trigger paths in event
   //const TriggerNames &trigName = iEvent.triggerNames(*hHLTresults);
   /*cout<<"trigger paths in event"<<endl;
-  for (unsigned int itrig = 0; itrig < trigName.size(); itrig++) {
+    for (unsigned int itrig = 0; itrig < trigName.size(); itrig++) {
     cout<<trigName.triggerName(itrig)<<endl;
-  }*/
+    }*/
 
   // look at the filters that were passed
   edm::Handle<trigger::TriggerEvent> triggerEventHandle;
@@ -516,7 +518,7 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   // ----------------------------------------------------------------------
   if ( muonHandle.isValid() && ctfTrackHandle.isValid() ) fillParticles( *(muonHandle.product()), *(ctfTrackHandle.product()) );
   else { cout << "--> Missing valid particle collection" << endl; }
-	
+
   // determine track IP
   for (Int_t itk=0; itk<fTkN; itk++) {
     float x1, y1, z1;
@@ -557,7 +559,7 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   // ----------------------------------------------------------------------
   if ( fJPsiN>1 ) makeEtabCand( t_tks );
 
-	if (fgsmmN>=4){
+  if (fgsmmN>=4){
     fTree->Fill();
   }
 }
@@ -583,7 +585,7 @@ void PATEventTree::init() {
       fJtBdRMatch[i] = false;
     }
   }
-	
+
   fHLTP_DoubleMu3_PS = fHLTP_DoubleMu6_PS = fHLTP_DoubleMu7_PS = fHLTP_Dimuon0_Upsilon_Muon_PS = fHLTP_Dimuon0_Jpsi_Muon_PS = fHLTP_Dimuon0_Jpsi_PS = fHLTP_Dimuon10_Jpsi_Barrel_PS = fHLTP_TripleMu5_PS = 0;
 
   for (int i = 0; i < 3; i++) {
@@ -604,7 +606,7 @@ void PATEventTree::init() {
   }
 
   for (int i = 0; i < fPcN; i++) {
-//    fMuChambers[i] = const std::vector <-999,-999>;
+    //    fMuChambers[i] = const std::vector <-999,-999>;
     fPcIndex[i] = fMuIndex[i] = fElecIndex[i] = fMiscTkIndex[i] = fPhotIndex[i] = fPcToGn[i] = fPcToTk[i] = fTkToPc[i] = fPcToPv[i] = fMuToHLT[i] = fPcToSsv[i] = fPcToGtv[i] = fPcTkQuality[i] = fPcPdgId[i] = -9999;
     fPcCharge[i] = fPcChi2[i] = fPcNdof[i] = fPcEnergy[i] = fPcEt[i] = fPcP[i] = fPcPt[i] = fPcPx[i] = fPcPy[i] = fPcPz[i] = fPcTheta[i] = fPcEta[i] = fPcPhi[i] = fPcD0[i] = fPcDz[i] = fPcEtaErr[i] = fPcPhiErr[i] = fPcD0Err[i] = fPcDzErr[i] = fPcVx[i] = fPcVy[i] = fPcVz[i] = fPcEcalIso[i] = fPcHcalIso[i] = fPcTrackIso[i] = fPcIP[i] = fPcIPxy[i] = -9999.;
     fPcJtN[i] = fPcPixHitN[i] = fPcPixLayN[i] = fPcStripHitN[i] = fPcStripLayN[i] = fMuHLTN[i] = fMuHitN[i] = fMuMatchedN[i] = fMuMatchedNSegArb[i]  = fMuMatchedNSegTrkArb[i] = fMuMatchedNSegTrkArbClean[i] = 0;
@@ -681,7 +683,7 @@ void PATEventTree::init() {
   }
 
   fPvN = fRePvN = fAllPvN = fHLTN = fPcN = fTkN = fMuN = fElecN = fMiscTkN = fPhotN = JtShift = fJtN = fJtStandN = fJtFatN = fJtSubN = fJtFiltN = fMETN = fSvN = fSsvN = fGtvN = fJPsiN = fEtabN = fHN = fGnN = fGnBN = fJtBdRN = fJtBFlavN = fgsmN = fgsmmN = fgtmN = 0;
-
+  bestProb = -9999;
 }
 
 
@@ -698,9 +700,9 @@ void PATEventTree::fillHLTPath(const unsigned int psSet, const edm::Handle<edm::
 
   // to cout all trigger paths in configuration
   /*cout<<"trigger paths in configuration"<<endl;
-  for (unsigned int it = 0; it < validTriggerNames.size(); it++) {
+    for (unsigned int it = 0; it < validTriggerNames.size(); it++) {
     cout<<validTriggerNames[it]<<endl;
-  }*/
+    }*/
 
   bool accept, wasrun, error;
   unsigned int prescale;
@@ -898,38 +900,38 @@ void PATEventTree::fillHLT(const pat::TriggerObjectStandAloneCollection& HLTObje
 
     // See if Jet trigger was detected
     if(
-      HLTObjects[fHLTN].hasPathName("HLT_Jet30_v1", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet30_v4", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet60_v1", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet60_v4", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet80_v1", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet80_v4", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet110_v1", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet110_v4", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet150_v1", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet150_v4", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet190_v1", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet190_v4", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet240_v1", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet240_v4", false, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet370_v1", false, false) ) {
+        HLTObjects[fHLTN].hasPathName("HLT_Jet30_v1", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet30_v4", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet60_v1", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet60_v4", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet80_v1", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet80_v4", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet110_v1", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet110_v4", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet150_v1", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet150_v4", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet190_v1", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet190_v4", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet240_v1", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet240_v4", false, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet370_v1", false, false) ) {
       fHLT_Jet[fHLTN][0] = true; 
     } if(
-      HLTObjects[fHLTN].hasPathName("HLT_Jet30_v1", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet30_v4", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet60_v1", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet60_v4", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet80_v1", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet80_v4", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet110_v1", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet110_v4", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet150_v1", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet150_v4", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet190_v1", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet190_v4", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet240_v1", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet240_v4", true, false) ||
-      HLTObjects[fHLTN].hasPathName("HLT_Jet370_v1", true, false) ) {
+        HLTObjects[fHLTN].hasPathName("HLT_Jet30_v1", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet30_v4", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet60_v1", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet60_v4", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet80_v1", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet80_v4", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet110_v1", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet110_v4", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet150_v1", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet150_v4", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet190_v1", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet190_v4", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet240_v1", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet240_v4", true, false) ||
+        HLTObjects[fHLTN].hasPathName("HLT_Jet370_v1", true, false) ) {
       fHLT_Jet[fHLTN][1] = true; 
     }
     fHLTN++;
@@ -981,9 +983,9 @@ void PATEventTree::fillGen(const std::vector<GenParticle>& genColl) {
       const Candidate* mother = genColl[ig].mother( (unsigned int) im );
       for ( int ig2 = (fGnN-1); ig2 >= 0; ig2-- ) {
         if( ((int)mother->pdgId()==fGnPdgId[ig2]) && ((int)mother->numberOfDaughters()==fGnNDaughters[ig2])
-          && ((float)mother->px()==fGnPx[ig2]) && ((float)mother->py()==fGnPy[ig2])
-          && ((float)mother->pz()==fGnPz[ig2]) && ((float)mother->vx()==fGnVx[ig2])
-          && ((float)mother->vy()==fGnVy[ig2]) && ((float)mother->vz()==fGnVz[ig2]) ) fGnMotherIndex[ig][im]=fGnIndex[ig2];
+            && ((float)mother->px()==fGnPx[ig2]) && ((float)mother->py()==fGnPy[ig2])
+            && ((float)mother->pz()==fGnPz[ig2]) && ((float)mother->vx()==fGnVx[ig2])
+            && ((float)mother->vy()==fGnVy[ig2]) && ((float)mother->vz()==fGnVz[ig2]) ) fGnMotherIndex[ig][im]=fGnIndex[ig2];
       }
     }
 
@@ -999,9 +1001,9 @@ void PATEventTree::fillGen(const std::vector<GenParticle>& genColl) {
       const Candidate* daughter = genColl[ig].daughter( (unsigned int) id );
       for ( int ig2 = 0; ig2 < fGnN; ig2++ ) {
         if( ((int)daughter->pdgId()==fGnPdgId[ig2]) && ((int)daughter->numberOfDaughters()==fGnNDaughters[ig2])
-          && ((float)daughter->px()==fGnPx[ig2]) && ((float)daughter->py()==fGnPy[ig2]) 
-          && ((float)daughter->pz()==fGnPz[ig2]) && ((float)daughter->vx()==fGnVx[ig2]) 
-          && ((float)daughter->vy()==fGnVy[ig2]) && ((float)daughter->vz()==fGnVz[ig2]) ) {
+            && ((float)daughter->px()==fGnPx[ig2]) && ((float)daughter->py()==fGnPy[ig2]) 
+            && ((float)daughter->pz()==fGnPz[ig2]) && ((float)daughter->vx()==fGnVx[ig2]) 
+            && ((float)daughter->vy()==fGnVy[ig2]) && ((float)daughter->vz()==fGnVz[ig2]) ) {
           fGnDaughterIndex[ig][id]=fGnIndex[ig2];
 
           // only consider end state B-hadrons, so veto if daughter is B-hadron
@@ -1032,7 +1034,7 @@ void PATEventTree::fillGen(const std::vector<GenParticle>& genColl) {
 void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std::vector<reco::Track>& ctftracks ){
 
   int TkI;  // the index of the underlying ctf track
-	fgsmN = fgsmmN = fgtmN = 0;
+  fgsmN = fgsmmN = fgtmN = 0;
   for (int i = 0; i != (int) muons.size(); i++) {
     if (fPcN > PARTMAX - 1) break;
 
@@ -1106,7 +1108,7 @@ void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std:
     }
     // muon specific
     fMuHitN[fMuN] = muons[fMuN].numberOfChambers();
-//    fMuChambers[fMuN]  = muons[fMuN].Chambers();
+    //    fMuChambers[fMuN]  = muons[fMuN].Chambers();
     fMuMatchedN[fMuN] = muons[fMuN].numberOfMatches();
     fMuMatchedNSegArb[fMuN] = muons[fMuN].numberOfMatches(reco::Muon::SegmentArbitration);
     fMuMatchedNSegTrkArb[fMuN] = muons[fMuN].numberOfMatches(reco::Muon::SegmentAndTrackArbitration);
@@ -1122,8 +1124,8 @@ void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std:
     fMu2DCompatibilityTight[fMuN] = muons[fMuN].muonID("TM2DCompatibilityTight");
     fMuOneStationLoose[fMuN] = muons[fMuN].muonID("TMOneStationLoose");
     fMuOneStationTight[fMuN] = muons[fMuN].muonID("TMOneStationTight");
-		fMuIsHighPurity[fMuN] = ctftracks[TkI].quality(reco::TrackBase::highPurity);
-		
+    fMuIsHighPurity[fMuN] = ctftracks[TkI].quality(reco::TrackBase::highPurity);
+
     // global fit info
     if( muons[fMuN].globalTrack().isNonnull() ) {
       fMuChi2[fMuN] = muons[fMuN].globalTrack()->chi2();
@@ -1145,30 +1147,30 @@ void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std:
     }
     fMuCalCompat[fMuN] = muons[fMuN].caloCompatibility();
 
-		if (muon::isGoodMuon(muons[fMuN],muon::SelectionType(12))
-				&& fPcPixLayN[fPcN] > 0 
-				&& fPcStripLayN[fPcN]>5 
-				&& fMuIsHighPurity[fMuN]
-				&& fPcD0[fPcN] < 0.3
-				&& fPcDz[fPcN] < 20.0)
-				{fgoodSoftMuon[fMuN] = 1; fgsmN++;}
-		if (muon::isGoodMuon(muons[fMuN],muon::SelectionType(11))
-				&& fPcPixLayN[fPcN] > 0 
-				&& fPcStripLayN[fPcN]>5 
-				&& fMuIsHighPurity[fMuN]
-				&& fPcD0[fPcN] < 0.3
-				&& fPcDz[fPcN] < 20.0)
-				{fgoodSoftMuonMod[fMuN] = 1; fgsmmN++;}
-		if (fMuIsGlobal[fMuN]
-				&& muons[fMuN].isPFMuon()
-				&& fMuChi2[fMuN] < 2
-				&& muons[fMuN].globalTrack()->hitPattern().numberOfValidMuonHits()>0
-				&& muons[fMuN].numberOfMatchedStations()>1
-				&& fabs(muons[fMuN].muonBestTrack()->d0()) < 0.2
-				&& fabs(muons[fMuN].muonBestTrack()->dz()) < 0.5
-				&& fPcPixHitN[fPcN] > 0 
-				&& fPcStripLayN[fPcN] > 5 )
-				{fgoodTightMuon[fMuN] = 1; fgtmN++;}
+    if (muon::isGoodMuon(muons[fMuN],muon::SelectionType(12))
+        && fPcPixLayN[fPcN] > 0 
+        && fPcStripLayN[fPcN]>5 
+        && fMuIsHighPurity[fMuN]
+        && fPcD0[fPcN] < 0.3
+        && fPcDz[fPcN] < 20.0)
+    {fgoodSoftMuon[fMuN] = 1; fgsmN++;}
+    if (muon::isGoodMuon(muons[fMuN],muon::SelectionType(11))
+        && fPcPixLayN[fPcN] > 0 
+        && fPcStripLayN[fPcN]>5 
+        && fMuIsHighPurity[fMuN]
+        && fPcD0[fPcN] < 0.3
+        && fPcDz[fPcN] < 20.0)
+    {fgoodSoftMuonMod[fMuN] = 1; fgsmmN++;}
+    if (fMuIsGlobal[fMuN]
+        && muons[fMuN].isPFMuon()
+        && fMuChi2[fMuN] < 2
+        && muons[fMuN].globalTrack()->hitPattern().numberOfValidMuonHits()>0
+        && muons[fMuN].numberOfMatchedStations()>1
+        && fabs(muons[fMuN].muonBestTrack()->d0()) < 0.2
+        && fabs(muons[fMuN].muonBestTrack()->dz()) < 0.5
+        && fPcPixHitN[fPcN] > 0 
+        && fPcStripLayN[fPcN] > 5 )
+    {fgoodTightMuon[fMuN] = 1; fgtmN++;}
 
 
 
@@ -1247,7 +1249,7 @@ void PATEventTree::fillDimuonCand(const reco::CompositeCandidateCollection& JPsi
 
     for(unsigned int ijpd = 0; ijpd < JPsiCands[fJPsiN].numberOfDaughters(); ijpd++) {
       if( ijpd==2 ) { cout<<"more than 2 JPsi daughters!"<<endl; break; }
-      
+
       const Candidate* daughter = JPsiCands[fJPsiN].daughter( ijpd );
       int MuI = -9999, TkI = -9999;
       for (int igm = 0; igm < (int) goodMuons.size(); igm++) {
@@ -1323,12 +1325,20 @@ void PATEventTree::fillDimuonCand(const reco::CompositeCandidateCollection& JPsi
           if( ClosestPVdist > distZ ) { 
             fJPsiClosestPVinZ[fJPsiN] = ip;
             ClosestPVdist = fabs( fJPsiVz[fJPsiN]-fPvZ[ip] );
-	  }
-	}
+          }
+        }
       }
     }
     fJPsiN++;
   } // end loop over JPsi candidates
+  for(int jj=0; jj<fJPsiN; jj++){
+    fJPsiBasicFilter[jj] = false;
+    if( fgoodSoftMuonMod[fJPsiMuI[jj][0]] && fgoodSoftMuonMod[fJPsiMuI[jj][1]]){
+      if( fJPsiChi2[jj]!=-9999 && TMath::Prob(fJPsiChi2[jj],fJPsiNdof[jj])>0.005 ) {
+        fJPsiBasicFilter[jj] = true;
+      }
+    }
+  }
 }
 
 void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
@@ -1381,12 +1391,12 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
         for(int imu1 = 0; imu1 < 4; imu1++) { // muons in earlier eta_b
           for(int imu2 = 0; imu2 < 4; imu2++) { // muons in this eta_b
             if( fEtabMuI[ie][imu1]==fEtabMuI[fEtabN][imu2] ) sameMu[imu2]=true;
-	  }
-	}
+          }
+        }
         if( sameMu[0] && sameMu[1] && sameMu[2] && sameMu[3] ) {
           fEtabDuplicatesI[fEtabN] = ie;
           break;
-	}
+        }
       }
 
       // make vertex from muons and fill vertex information
@@ -1457,7 +1467,7 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
 
           jpsi1T = sqrt( (x1-px3)*(x1-px3)+(y1-py3)*(y1-py3)+(z1-pz3)*(z1-pz3) );
           jpsi1L = sqrt( (x1-fEtabVx[fEtabN])*(x1-fEtabVx[fEtabN])+(y1-fEtabVy[fEtabN])*(y1-fEtabVy[fEtabN])+(z1-fEtabVz[fEtabN])*(z1-fEtabVz[fEtabN]) );
-	}
+        }
 
         // find 2nd J/Psi distances to Eta_b vector
         if( fJPsiVx[ijp2]!=-9999.0 ) {
@@ -1472,7 +1482,7 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
 
           jpsi2T = sqrt( (x2-px3)*(x2-px3)+(y2-py3)*(y2-py3)+(z2-pz3)*(z2-pz3) );
           jpsi2L = sqrt( (x2-fEtabVx[fEtabN])*(x2-fEtabVx[fEtabN])+(y2-fEtabVy[fEtabN])*(y2-fEtabVy[fEtabN])+(z2-fEtabVz[fEtabN])*(z2-fEtabVz[fEtabN]) );
-	}
+        }
 
         // find J/Psi distances to each other, and error
         if( fJPsiVx[ijp1]!=-9999.0 && fJPsiVx[ijp2]!=-9999.0 ) {
@@ -1488,7 +1498,7 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
           DeltaZ = fJPsiVz[fEtabJPsiI[fEtabN][0]]-fJPsiVz[fEtabJPsiI[fEtabN][1]];
           fEtabJPsiVtxErr[fEtabN] = sqrt( pow(DeltaX,2)*( pow(fJPsiVxE[fEtabJPsiI[fEtabN][0]],2)+pow(fJPsiVxE[fEtabJPsiI[fEtabN][1]],2) ) + pow(DeltaY,2)*( pow(fJPsiVyE[fEtabJPsiI[fEtabN][0]],2)+pow(fJPsiVyE[fEtabJPsiI[fEtabN][1]],2) ) + pow(DeltaZ,2)*( pow(fJPsiVzE[fEtabJPsiI[fEtabN][0]],2)+pow(fJPsiVzE[fEtabJPsiI[fEtabN][1]],2) ) ) / sqrt( pow(DeltaX,2)+pow(DeltaY,2)+pow(DeltaZ,2) );
           fEtabJPsiVtxErrxy[fEtabN] = sqrt( pow(DeltaX,2)*( pow(fJPsiVxE[fEtabJPsiI[fEtabN][0]],2)+pow(fJPsiVxE[fEtabJPsiI[fEtabN][1]],2) ) + pow(DeltaY,2)*( pow(fJPsiVyE[fEtabJPsiI[fEtabN][0]],2)+pow(fJPsiVyE[fEtabJPsiI[fEtabN][1]],2) ) ) / sqrt( pow(DeltaX,2)+pow(DeltaY,2) );
-	}
+        }
 
         // find CT and CTxy
         if( fPvX[0]!=-9999 ) {
@@ -1501,7 +1511,7 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
           // using vtx kinematics
           fEtabVtxCTxy[fEtabN] = (xvecX*fEtabVtxPx[fEtabN]+xvecY*fEtabVtxPy[fEtabN])/fEtabVtxPt[fEtabN];
           fEtabVtxCT[fEtabN] = (xvecX*fEtabVtxPx[fEtabN]+xvecY*fEtabVtxPy[fEtabN]+xvecZ*fEtabVtxPz[fEtabN])/fEtabVtxP[fEtabN];
-	}
+        }
       }
 
       // Determine isolation information
@@ -1544,12 +1554,12 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
           // first isolation type
           if( fPcPt[ipc]>0.9 && (fJPsiClosestPVinZ[fEtabJPsiI[fEtabN][ijp]]==fPcToPv[ipc] || (dCA<0.5&&fPcToPv[ipc]==-9999)) && dRToJPsi<0.7 ) {
             SumPt = SumPt+fPcPt[ipc];
-	  }
+          }
           // second isolation type
           if( fPcPt[ipc]>0.5 && (fJPsiClosestPVinZ[fEtabJPsiI[fEtabN][ijp]]==fPcToPv[ipc] || fPcToPv[ipc]==-9999) && dCA<0.3 ) {
             if( dCA<fEtabJPsiIsoTkCA[fEtabN][ijp] ) fEtabJPsiIsoTkCA[fEtabN][ijp] = dCA;
             fEtabJPsiIsoTkN[fEtabN][ijp] = fEtabJPsiIsoTkN[fEtabN][ijp]+1;
-	  }
+          }
 
 
         } // end loop over particles
@@ -1569,8 +1579,8 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
         for (Int_t ipc=0; ipc<fTkN; ipc++) {
           if( fEtabMuI[fEtabN][0]==ipc || fEtabMuI[fEtabN][1]==ipc || fEtabMuI[fEtabN][2]==ipc || fEtabMuI[fEtabN][3]==ipc ) continue;
           if( fPcToTk[ipc]!=-9999 && fPcToPv[ipc]==0 ) refit_tks.push_back(t_tks[fPcToTk[ipc]]);
-	}
-	if( refit_tks.size()>1 ) {
+        }
+        if( refit_tks.size()>1 ) {
           KalmanVertexFitter kvf(true);
           TransientVertex refit_pv = kvf.vertex(refit_tks);
           if( refit_pv.isValid() ) {
@@ -1598,8 +1608,8 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
             fPvEta[fAllPvN] = (float) -log(tan(0.5*acos(pvP4.pz()/sqrt(pvP4.px()*pvP4.px()+pvP4.py()*pvP4.py()+pvP4.pz()*pvP4.pz()))));
             fPvMass[fAllPvN] = (float) pvP4.M();
             fRePvN++; fAllPvN++;
-	  }
-	}
+          }
+        }
       }
       // determine CT and error relative to J/Psi
       if( fEtabToRePvI[fEtabN]!=-9999 && fEtabJPsiI[fEtabN][0]!=-9999 && fEtabJPsiI[fEtabN][1]!=-9999 ) {
@@ -1634,6 +1644,20 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
       fEtabN++;
     } // end loop over second dimu cand
   } // end loop over first dimu cand
+  for(int ee=0; ee<fEtabN; ++ee){
+    fEtabBasicFilter[ee]=false;
+    if( fJPsiBasicFilter[fEtabJPsiI[ee][0]] && fJPsiBasicFilter[fEtabJPsiI[ee][1]]){
+      if( fEtabChi2[ee]!=-9999 && TMath::Prob(fEtabChi2[ee],fEtabNdof[ee])>0.005 ){
+        fEtabBasicFilter[ee] = true;
+      }
+    }
+  }
+  fEtabBestVtxProbI = -999;
+  bestProb = -999;
+  for(int ef=0; ef<fEtabN;++ef){
+    if( fEtabBasicFilter[ef] && TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]) > bestProb ) { fEtabBestVtxProbI = ef; bestProb = TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]);
+    }
+  }
 }
 // define this as a plug-in
 DEFINE_FWK_MODULE(PATEventTree);
