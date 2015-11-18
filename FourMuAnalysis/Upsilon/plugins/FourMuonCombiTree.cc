@@ -150,7 +150,6 @@ void PATEventTree::beginJob() {
   fTree->Branch("PcIP",         fPcIP,          "PcIP[PcN]/F");
   fTree->Branch("PcIPxy",       fPcIPxy,        "PcIPxy[PcN]/F");
   fTree->Branch("MuHitN",       fMuHitN,        "MuHitN[MuN]/I");
-  //  fTree->Branch("MuChambers",	&fMuChambers,	"MuChambers[MuN]/I");
   fTree->Branch("MuMatchedN",   fMuMatchedN,    "MuMatchedN[MuN]/I");
   fTree->Branch("MuMatchedNSegArb",   fMuMatchedNSegArb,    "MuMatchedNSegArb[MuN]/I");
   fTree->Branch("MuMatchedNSegTrkArb",   fMuMatchedNSegTrkArb,    "MuMatchedNSegTrkArb[MuN]/I");
