@@ -64,11 +64,11 @@ process.UpsCand = cms.EDProducer("CandViewShallowCloneCombiner",
 process.makeUpsCand = cms.Path(process.UpsCand)
 process.DiMuCand = cms.EDProducer("CandViewShallowCloneCombiner",
                 decay = cms.string('goodMuons@+ goodMuons@-'),
-                cut = cms.string('mass<9.1'),
+                cut = cms.string(''),
                 )
 process.makeDiMuCand = cms.Path(process.DiMuCand)
 process.FourMuCand= cms.EDProducer("CandViewShallowCloneCombiner",
-                decay = cms.string('UpsCand DiMuCand'),
+                decay = cms.string('DiMuCand DiMuCand'),
                 cut = cms.string(''),
                 )
 process.makeFourMuCand = cms.Path(process.FourMuCand)

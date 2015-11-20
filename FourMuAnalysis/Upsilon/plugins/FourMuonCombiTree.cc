@@ -16,7 +16,7 @@
 #include <vector>
 #include <bitset>
 
-#include "PATEventTree_Flatten.h"
+#include "FourMuonCombiTree.h"
 
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -47,7 +47,7 @@ using namespace reco;
 using namespace pat;
 
 // ----------------------------------------------------------------------
-PATEventTree::PATEventTree(edm::ParameterSet const& iConfig): 
+FourMuonCombiTree::FourMuonCombiTree(edm::ParameterSet const& iConfig): 
   fRootFileName(iConfig.getUntrackedParameter<string>("rootFileName", string("PATEventTree.root"))),
   fIsMC(iConfig.getUntrackedParameter<bool>("isMC", false)),
   fHLTPathLabel(iConfig.getUntrackedParameter<InputTag>("HLTPathLabel", edm::InputTag("TriggerResults::HLT"))),
@@ -61,9 +61,9 @@ PATEventTree::PATEventTree(edm::ParameterSet const& iConfig):
   fDimuonInputLabel(iConfig.getUntrackedParameter<InputTag>("DimuonInputLabel", edm::InputTag("goodMuons"))),
   fInit(0)
 {
-  string rcsid = string("$Id: PATEventTree.cc,v 2.00 2015/11/03 11:25:00 Exp $");
+  string rcsid = string("$Id: FourMuonCombiTree.cc,v 2.00 2015/11/03 11:25:00 Exp $");
   cout << "----------------------------------------------------------------------" << endl;
-  cout << "---  PATEventTree flattener" << endl;
+  cout << "---  Combinatorics calc flattener" << endl;
   cout << "---  version:                         " << rcsid << endl;
   cout << "---  rootFileName:                    " << fRootFileName << endl;
   cout << "---  MuonCollectionLabel:             " << fMuonCollectionLabel << endl;
@@ -72,10 +72,10 @@ PATEventTree::PATEventTree(edm::ParameterSet const& iConfig):
 }
 
 // ----------------------------------------------------------------------
-PATEventTree::~PATEventTree() { }  
+FourMuonCombiTree::~FourMuonCombiTree() { }  
 
 // ----------------------------------------------------------------------
-void PATEventTree::endJob() {
+void FourMuonCombiTree::endJob() {
 
   fFile->cd();
   fFile->Write();
@@ -87,7 +87,7 @@ void PATEventTree::endJob() {
 }
 
 // ----------------------------------------------------------------------
-void PATEventTree::beginJob() {
+void FourMuonCombiTree::beginJob() {
 
   fFile = TFile::Open(fRootFileName.c_str(), "RECREATE");
   fFile->cd();
@@ -150,7 +150,6 @@ void PATEventTree::beginJob() {
   fTree->Branch("PcIP",         fPcIP,          "PcIP[PcN]/F");
   fTree->Branch("PcIPxy",       fPcIPxy,        "PcIPxy[PcN]/F");
   fTree->Branch("MuHitN",       fMuHitN,        "MuHitN[MuN]/I");
-  //  fTree->Branch("MuChambers",	&fMuChambers,	"MuChambers[MuN]/I");
   fTree->Branch("MuMatchedN",   fMuMatchedN,    "MuMatchedN[MuN]/I");
   fTree->Branch("MuMatchedNSegArb",   fMuMatchedNSegArb,    "MuMatchedNSegArb[MuN]/I");
   fTree->Branch("MuMatchedNSegTrkArb",   fMuMatchedNSegTrkArb,    "MuMatchedNSegTrkArb[MuN]/I");
@@ -373,24 +372,35 @@ void PATEventTree::beginJob() {
     fTree->Branch("GnDaughterIndex", fGnDaughterIndex, "GnDaughterIndex[GnN][20]/I");
   }
 
+  gTree = new TTree("Combinatorics", "Combinatorics");
+
+  gTree->Branch("EtabN",        &fEtabN,        "EtabN/I");
+  gTree->Branch("EtabCombiVtxMass",    fEtabCombiVtxMass,     "EtabCombiVtxMass[EtabN]/F");
+  gTree->Branch("EtabCombiChi2",     fEtabCombiChi2,      "EtabCombiChi2[EtabN]/F");
+  gTree->Branch("EtabCombiNdof",     fEtabCombiNdof,      "EtabCombiNdof[EtabN]/F");
+  gTree->Branch("JPsiCombi1Chi2",        fJPsiCombi1Chi2,         "JPsiCombi1Chi2[EtabN]/F");
+  gTree->Branch("JPsiCombi1Ndof",        fJPsiCombi1Ndof,         "JPsiCombi1Ndof[EtabN]/F");
+  gTree->Branch("JPsiCombi1VtxMass",          fJPsiCombi1VtxMass,           "JPsiCombi1VtxMass[EtabN]/F");
+  gTree->Branch("JPsiCombi2Chi2",        fJPsiCombi2Chi2,         "JPsiCombi2Chi2[EtabN]/F");
+  gTree->Branch("JPsiCombi2Ndof",        fJPsiCombi2Ndof,         "JPsiCombi2Ndof[EtabN]/F");
+  gTree->Branch("JPsiCombi2VtxMass",          fJPsiCombi2VtxMass,           "JPsiCombi2VtxMass[EtabN]/F");
 }
 
-
 // ----------------------------------------------------------------------
-void  PATEventTree::beginRun(const Run &run, const EventSetup &iSetup) {
+void  FourMuonCombiTree::beginRun(const Run &run, const EventSetup &iSetup) {
   bool hasChanged;
   fValidHLTConfig = fHltConfig.init(run,iSetup,"HLT",hasChanged);
 }
 
 
 // ----------------------------------------------------------------------
-void PATEventTree::endRun(Run const &run, EventSetup const&iSetup) {
+void FourMuonCombiTree::endRun(Run const &run, EventSetup const&iSetup) {
   fValidHLTConfig = false;
 } 
 
 
 // ----------------------------------------------------------------------
-void PATEventTree::analyze(const edm::Event& iEvent,
+void FourMuonCombiTree::analyze(const edm::Event& iEvent,
     const edm::EventSetup& iSetup) {
 
   // ----------------------------------------------------------------------
@@ -564,12 +574,13 @@ void PATEventTree::analyze(const edm::Event& iEvent,
 
   if (fgsmmN>=4){
     fTree->Fill();
+    gTree->Fill();
   }
 }
 
 
 // ------------------------------------------------------------------------
-void PATEventTree::init() {
+void FourMuonCombiTree::init() {
 
   fEvSphericity = fEvAplanarity = fEvLambda[0] = fEvLambda[1] = fEvLambda[2] = fEvThrust = fEvThrust_Major = fEvThrust_Minor = -9999.;
   for (int i = 0; i < 7; i++) fEvFW[i] = -9999.;
@@ -669,7 +680,7 @@ void PATEventTree::init() {
   for (int i = 0; i < ETABMAX; i++) {
     fEtabIndex[i] = fEtabDuplicatesI[i] = fEtabJPsiI[i][0] = fEtabJPsiI[i][1] = fEtabMuI[i][0] = fEtabMuI[i][1] = fEtabMuI[i][2] = fEtabMuI[i][3] = fEtabJPsiIsoTkN[i][0] = fEtabJPsiIsoTkN[i][1] = fEtabToRePvI[i] = -9999;
     fEtabMuN[i] = 0;
-    fEtabCharge[i] = fEtabPhi[i] = fEtabTheta[i] = fEtabEta[i] = fEtabRapidity[i] = fEtabP[i] = fEtabPt[i] = fEtabPx[i] = fEtabPy[i] = fEtabPz[i] = fEtabEnergy[i] = fEtabEt[i] = fEtabMass[i] = fEtabMt[i] = fEtabVx[i] = fEtabVy[i] = fEtabVz[i] = fEtabVxE[i] = fEtabVyE[i] = fEtabVzE[i] = fEtabVtxPhi[i] = fEtabVtxTheta[i] = fEtabVtxEta[i] = fEtabVtxRapidity[i] = fEtabVtxP[i] = fEtabVtxPt[i] = fEtabVtxPx[i] = fEtabVtxPy[i] = fEtabVtxPz[i] = fEtabVtxEnergy[i] = fEtabVtxEt[i] = fEtabVtxMass[i] = fEtabVtxMt[i] = fEtabCT[i] = fEtabCTxy[i] = fEtabJPsiDeltaL[i] = fEtabJPsiDeltaT[i] = fEtabJPsiVtxErr[i] = fEtabJPsiVtxErrxy[i] = fEtabJPsiProjX[i][0] = fEtabJPsiProjX[i][1] = fEtabJPsiProjY[i][0] = fEtabJPsiProjY[i][1] = fEtabJPsiProjZ[i][0] = fEtabJPsiProjZ[i][1] = fEtabJPsiIso7PV[i][0] = fEtabJPsiIso7PV[i][1] = fEtabJPsiIsoTkCA[i][0] = fEtabJPsiIsoTkCA[i][1] = fEtabJPsiCT[i][0] = fEtabJPsiCT[i][1] = fEtabJPsiCTxy[i][0] = fEtabJPsiCTxy[i][1] = fEtabJPsiVtxCT[i][0] = fEtabJPsiVtxCT[i][1] = fEtabJPsiVtxCTxy[i][0] = fEtabJPsiVtxCTxy[i][1] = fEtabJPsiToPVVtxErr[i][0] = fEtabJPsiToPVVtxErr[i][1] = fEtabJPsiToPVVtxErrxy[i][0] = fEtabJPsiToPVVtxErrxy[i][1] = -9999.;
+    fEtabCharge[i] = fEtabPhi[i] = fEtabTheta[i] = fEtabEta[i] = fEtabRapidity[i] = fEtabP[i] = fEtabPt[i] = fEtabPx[i] = fEtabPy[i] = fEtabPz[i] = fEtabEnergy[i] = fEtabEt[i] = fEtabMass[i] = fEtabMt[i] = fEtabVx[i] = fEtabVy[i] = fEtabVz[i] = fEtabVxE[i] = fEtabVyE[i] = fEtabVzE[i] = fEtabVtxPhi[i] = fEtabVtxTheta[i] = fEtabVtxEta[i] = fEtabVtxRapidity[i] = fEtabVtxP[i] = fEtabVtxPt[i] = fEtabVtxPx[i] = fEtabVtxPy[i] = fEtabVtxPz[i] = fEtabVtxEnergy[i] = fEtabVtxEt[i] = fEtabVtxMass[i] = fEtabVtxMt[i] = fEtabCT[i] = fEtabCTxy[i] = fEtabJPsiDeltaL[i] = fEtabJPsiDeltaT[i] = fEtabJPsiVtxErr[i] = fEtabJPsiVtxErrxy[i] = fEtabJPsiProjX[i][0] = fEtabJPsiProjX[i][1] = fEtabJPsiProjY[i][0] = fEtabJPsiProjY[i][1] = fEtabJPsiProjZ[i][0] = fEtabJPsiProjZ[i][1] = fEtabJPsiIso7PV[i][0] = fEtabJPsiIso7PV[i][1] = fEtabJPsiIsoTkCA[i][0] = fEtabJPsiIsoTkCA[i][1] = fEtabJPsiCT[i][0] = fEtabJPsiCT[i][1] = fEtabJPsiCTxy[i][0] = fEtabJPsiCTxy[i][1] = fEtabJPsiVtxCT[i][0] = fEtabJPsiVtxCT[i][1] = fEtabJPsiVtxCTxy[i][0] = fEtabJPsiVtxCTxy[i][1] = fEtabJPsiToPVVtxErr[i][0] = fEtabJPsiToPVVtxErr[i][1] = fEtabJPsiToPVVtxErrxy[i][0] = fEtabJPsiToPVVtxErrxy[i][1] = fEtabCombiVtxMass[i] = fEtabCombiChi2[i] = fEtabCombiNdof[i] = fJPsiCombi1Ndof[i] = fJPsiCombi1Chi2[i] = fJPsiCombi1VtxMass[i] = fJPsiCombi2Ndof[i] = fJPsiCombi2Chi2[i] = fJPsiCombi2VtxMass[i] = -9999.;
   }
   if ( fIsEtabJPsi&&fIsJPsiMuMu ) { fEtabI = fEtabdRMatchI = -9999; }
 
@@ -690,7 +701,7 @@ void PATEventTree::init() {
 }
 
 
-void PATEventTree::fillHLTPath(const unsigned int psSet, const edm::Handle<edm::TriggerResults>& hHLTresults, const trigger::TriggerEvent& triggerEvent) {
+void FourMuonCombiTree::fillHLTPath(const unsigned int psSet, const edm::Handle<edm::TriggerResults>& hHLTresults, const trigger::TriggerEvent& triggerEvent) {
 
   // -- Read HLT configuration and names
   vector<string> validTriggerNames;
@@ -840,7 +851,7 @@ void PATEventTree::fillHLTPath(const unsigned int psSet, const edm::Handle<edm::
 }
 
 
-void PATEventTree::fillHLT(const pat::TriggerObjectStandAloneCollection& HLTObjects) {
+void FourMuonCombiTree::fillHLT(const pat::TriggerObjectStandAloneCollection& HLTObjects) {
 
   for ( int ih = 0; ih < (int) HLTObjects.size(); ih++) {
     if ( fHLTN > HLTMAX-1 ) break;
@@ -942,7 +953,7 @@ void PATEventTree::fillHLT(const pat::TriggerObjectStandAloneCollection& HLTObje
 }
 
 
-void PATEventTree::fillGen(const std::vector<GenParticle>& genColl) {
+void FourMuonCombiTree::fillGen(const std::vector<GenParticle>& genColl) {
 
   for ( unsigned int ig = 0; ig < genColl.size(); ig++) {
     if ( fGnN > GENMAX-1 ) break;
@@ -1034,7 +1045,7 @@ void PATEventTree::fillGen(const std::vector<GenParticle>& genColl) {
 }
 
 
-void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std::vector<reco::Track>& ctftracks ){
+void FourMuonCombiTree::fillParticles(const std::vector<pat::Muon>& muons, const std::vector<reco::Track>& ctftracks ){
 
   int TkI;  // the index of the underlying ctf track
   fgsmN = fgsmmN = fgtmN = 0;
@@ -1181,7 +1192,7 @@ void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std:
     fPcN++;
   }
 }
-void PATEventTree::fillPrimaryVertices(const std::vector<Vertex>& vertices) {
+void FourMuonCombiTree::fillPrimaryVertices(const std::vector<Vertex>& vertices) {
 
   for (unsigned int i = 0; i != vertices.size(); i++) {
     if (fAllPvN > PVMAX - 1) break;
@@ -1228,7 +1239,7 @@ void PATEventTree::fillPrimaryVertices(const std::vector<Vertex>& vertices) {
   }
 }
 
-void PATEventTree::fillDimuonCand(const reco::CompositeCandidateCollection& JPsiCands, const reco::MuonRefVector& goodMuons, std::vector<TransientTrack>& t_tks) {
+void FourMuonCombiTree::fillDimuonCand(const reco::CompositeCandidateCollection& JPsiCands, const reco::MuonRefVector& goodMuons, std::vector<TransientTrack>& t_tks) {
 
   for(unsigned int ijp = 0; ijp < JPsiCands.size(); ijp++) {
     if( fJPsiN == JPsiMAX ) break;
@@ -1279,6 +1290,15 @@ void PATEventTree::fillDimuonCand(const reco::CompositeCandidateCollection& JPsi
     // set BaseJPsiI = index of highest Pt JPsi whose muons pass basic cuts
     if ( fBaseJPsiI[0]==-9999&&fJPsiMuI[fJPsiN][0]!=-9999&&fJPsiMuI[fJPsiN][1]!=-9999&&fJPsiMuCutSA[fJPsiN][0]&&fJPsiMuCutSA[fJPsiN][1]&&fJPsiMuCutTrk[fJPsiN][0]&&fJPsiMuCutTrk[fJPsiN][1]&&(fJPsiMuCutHLT[fJPsiN][0]||fJPsiMuCutHLT[fJPsiN][1]) ) fBaseJPsiI[0] = fJPsiN;
     else if ( fBaseJPsiI[0]!=-9999&&fBaseJPsiI[1]==-9999&&fJPsiMuI[fJPsiN][0]!=-9999&&fJPsiMuI[fJPsiN][1]!=-9999&&(fJPsiMuI[fJPsiN][0]!=fJPsiMuI[fBaseJPsiI[0]][0]&&fJPsiMuI[fJPsiN][0]!=fJPsiMuI[fBaseJPsiI[0]][1])&&(fJPsiMuI[fJPsiN][1]!=fJPsiMuI[fBaseJPsiI[0]][0]&&fJPsiMuI[fJPsiN][1]!=fJPsiMuI[fBaseJPsiI[0]][1])&&fJPsiMuCutSA[fJPsiN][0]&&fJPsiMuCutSA[fJPsiN][1]&&fJPsiMuCutTrk[fJPsiN][0]&&fJPsiMuCutTrk[fJPsiN][1]&&(fJPsiMuCutHLT[fJPsiN][0]||fJPsiMuCutHLT[fJPsiN][1]) ) fBaseJPsiI[1] = fJPsiN;
+    // veto jets if they have muon from JPsi
+    if( fJPsiMuCategory[fJPsiN][0]>0 && fJPsiMuCategory[fJPsiN][1]>0 && fJPsiMass[0]>2.8 && fJPsiMass[0]<3.35 ) {
+      for(int ij = 0; ij < fJtN; ij++) {
+        for(int ijt = 0; ijt < fJtTkN[ij]; ijt++) {
+          if( fJtToPc[ij][ijt]>=0 && (fJtToPc[ij][ijt]==fJPsiMuI[fJPsiN][0]||fJtToPc[ij][ijt]==fJPsiMuI[fJPsiN][1]) ) fJtVeto[ij]=true;
+        } // end loop over jet tracks
+      }  // end loop over jets
+    }
+
     // make J/Psi vertex from muons and fill vertex information
     vector<TransientTrack> mu_tks;
     if( fJPsiMuI[fJPsiN][0]!=-9999 && fPcToTk[fJPsiMuI[fJPsiN][0]]!=-9999 ) mu_tks.push_back(t_tks[fPcToTk[fJPsiMuI[fJPsiN][0]]]);
@@ -1335,7 +1355,7 @@ void PATEventTree::fillDimuonCand(const reco::CompositeCandidateCollection& JPsi
   }
 }
 
-void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
+void FourMuonCombiTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
 
   for(int ijp1 = 0; ijp1 < fJPsiMuMuN-1; ijp1++) {
     if( fEtabN == ETABMAX ) break;
@@ -1645,10 +1665,10 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
     if( fJPsiBasicFilter[fEtabJPsiI[ee][0]] && fJPsiBasicFilter[fEtabJPsiI[ee][1]]){
       if( fEtabChi2[ee]!=-9999 && TMath::Prob(fEtabChi2[ee],fEtabNdof[ee])>0.005 ){
         fEtabBasicFilter[ee] = true;
-        if (fJPsiVtxMass[fEtabJPsiI[ee][0]] > 2.85 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 3.35 && fJPsiVtxMass[fEtabJPsiI[ee][1]] > 2.85 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 3.35){
+        if (fJPsiMass[fEtabJPsiI[ee][0]] > 2.85 && fJPsiMass[fEtabJPsiI[ee][0]] < 3.35 && fJPsiMass[fEtabJPsiI[ee][1]] > 2.85 && fJPsiMass[fEtabJPsiI[ee][1]] < 3.35){
           fEtabDJFilter[ee] = true;
         }
-        if ((fJPsiVtxMass[fEtabJPsiI[ee][0]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75) || (fJPsiVtxMass[fEtabJPsiI[ee][1]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75)){
+        if ((fJPsiMass[fEtabJPsiI[ee][0]] > 9.1 && fJPsiMass[fEtabJPsiI[ee][0]] < 9.75 && fJPsiMass[fEtabJPsiI[ee][1]] < 9.75) || (fJPsiMass[fEtabJPsiI[ee][1]] > 9.1 && fJPsiMass[fEtabJPsiI[ee][1]] < 9.75 && fJPsiMass[fEtabJPsiI[ee][0]] < 9.75)){
           fEtabUpsFilter[ee] = true;
         }
         
@@ -1667,6 +1687,72 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
       fEtabBestUpsProbI = ef; bestProb1 = TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]);
     }
   }
+  combimu1 = -999;
+  combimu2 = -999;
+  combimu3 = -999;
+  combimu4 = -999;
+  for( int ek=0; ek<fEtabN; ++ek){
+    if (fEtabUpsFilter[ek] && fEtabVtxMass[ek]>=0 && TMath::Prob(fEtabChi2[ek],fEtabNdof[ek])>=0.05){
+      if( fPcCharge[fJPsiMuI[fEtabJPsiI[ek][0]][0]]>0 ){
+       combimu1=fMuIndex[fJPsiMuI[fEtabJPsiI[ek][0]][0]];
+       combimu2=fMuIndex[fJPsiMuI[fEtabJPsiI[ek][0]][1]];
+      }
+      else{
+       combimu2=fMuIndex[fJPsiMuI[fEtabJPsiI[ek][0]][0]];
+       combimu1=fMuIndex[fJPsiMuI[fEtabJPsiI[ek][0]][1]];
+      }
+      if( fPcCharge[fJPsiMuI[fEtabJPsiI[ek][1]][0]]>0 ){
+       combimu3=fMuIndex[fJPsiMuI[fEtabJPsiI[ek][1]][0]];
+       combimu4=fMuIndex[fJPsiMuI[fEtabJPsiI[ek][1]][1]];
+      }
+      else{
+       combimu4=fMuIndex[fJPsiMuI[fEtabJPsiI[ek][1]][0]];
+       combimu3=fMuIndex[fJPsiMuI[fEtabJPsiI[ek][1]][1]];
+      }
+
+      // make vertex from muons and fill vertex information
+      vector<TransientTrack> mucombi_tks;
+      vector<TransientTrack> dimucombi1_tks;
+      vector<TransientTrack> dimucombi2_tks;
+      if( fPcToTk[combimu1]!=-9999 ) mucombi_tks.push_back(t_tks[fPcToTk[combimu1]]);
+      if( fPcToTk[combimu2]!=-9999 ) mucombi_tks.push_back(t_tks[fPcToTk[combimu2]]);
+      if( fPcToTk[combimu3]!=-9999 ) mucombi_tks.push_back(t_tks[fPcToTk[combimu3]]);
+      if( fPcToTk[combimu4]!=-9999 ) mucombi_tks.push_back(t_tks[fPcToTk[combimu4]]);
+      if( fPcToTk[combimu1]!=-9999 ) dimucombi1_tks.push_back(t_tks[fPcToTk[combimu1]]);
+      if( fPcToTk[combimu4]!=-9999 ) dimucombi1_tks.push_back(t_tks[fPcToTk[combimu4]]);
+      if( fPcToTk[combimu2]!=-9999 ) dimucombi2_tks.push_back(t_tks[fPcToTk[combimu2]]);
+      if( fPcToTk[combimu3]!=-9999 ) dimucombi2_tks.push_back(t_tks[fPcToTk[combimu3]]);
+
+      if( mucombi_tks.size() == 4 ) {
+        KalmanVertexFitter kvf(true);
+        TransientVertex etabcombi_cand = kvf.vertex(mucombi_tks);
+        TransientVertex dimucombi1_cand = kvf.vertex(dimucombi1_tks);
+        TransientVertex dimucombi2_cand = kvf.vertex(dimucombi2_tks);
+        if( etabcombi_cand.isValid() ) {
+          reco::Vertex etabcombi_vtx = etabcombi_cand;
+          const math::XYZTLorentzVectorD etabcombi_mom = etabcombi_vtx.p4(0.1056583,0.0);
+          fEtabCombiChi2[ek]     = (float) etabcombi_vtx.chi2();
+          fEtabCombiNdof[ek]     = (float) etabcombi_vtx.ndof();
+          fEtabCombiVtxMass[ek]  = (float) etabcombi_mom.mass();
+
+        }
+        if( dimucombi1_cand.isValid() ) {
+          reco::Vertex dimucombi1_vtx = dimucombi1_cand;
+          const math::XYZTLorentzVectorD dimucombi1_mom = dimucombi1_vtx.p4(0.1056583,0.0);
+          fJPsiCombi1Chi2[ek]     = (float) dimucombi1_vtx.chi2();
+          fJPsiCombi1Ndof[ek]     = (float) dimucombi1_vtx.ndof();
+          fJPsiCombi1VtxMass[ek]  = (float) dimucombi1_mom.mass();
+        }
+        if( dimucombi2_cand.isValid() ) {
+          reco::Vertex dimucombi2_vtx = dimucombi2_cand;
+          const math::XYZTLorentzVectorD dimucombi2_mom = dimucombi2_vtx.p4(0.1056583,0.0);
+          fJPsiCombi2Chi2[ek]     = (float) dimucombi2_vtx.chi2();
+          fJPsiCombi2Ndof[ek]     = (float) dimucombi2_vtx.ndof();
+          fJPsiCombi2VtxMass[ek]  = (float) dimucombi2_mom.mass();
+        }
+      }
+    }
+  }
 }
 // define this as a plug-in
-DEFINE_FWK_MODULE(PATEventTree);
+DEFINE_FWK_MODULE(FourMuonCombiTree);

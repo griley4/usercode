@@ -1,9 +1,9 @@
-#ifndef PATEventTree_h
-#define PATEventTree_h
+#ifndef FourMuonCombiTree_h
+#define FourMuonCombiTree_h
 
-/** \class PATEventTree
+/** \class FourMuonCombiTree
  * ----------------------------------------------------------------------
- * PATEventTree
+ * FourMuonCombiTree 
  * ---------
  * Summary: Create ntuple with event information from PAT
  *        
@@ -52,11 +52,11 @@ class TTree;
 class TH1D;
 class TFile;
 
-class PATEventTree : public edm::EDAnalyzer {
+class FourMuonCombiTree : public edm::EDAnalyzer {
  public:
   
-  explicit PATEventTree(const edm::ParameterSet& ps);
-  virtual ~PATEventTree();
+  explicit FourMuonCombiTree(const edm::ParameterSet& ps);
+  virtual ~FourMuonCombiTree();
   virtual void beginJob();
   virtual void endJob();
   virtual void beginRun(const edm::Run &run, const edm::EventSetup &iSetup);
@@ -90,7 +90,7 @@ class PATEventTree : public edm::EDAnalyzer {
 
   TFile *fFile;
   TH1D  *fL1Thist, *fL1TThist, *fHLThist;
-  TTree *fTree;
+  TTree *fTree, *gTree;
 
   bool  useEvent, fValidHLTConfig;
   int   nevt, fInit;
@@ -195,10 +195,10 @@ class PATEventTree : public edm::EDAnalyzer {
 
   int fEtabN, fBaseEtabI, EtabBestVtxProbI;
   int fEtabIndex[ETABMAX], fEtabDuplicatesI[ETABMAX], fEtabJPsiI[ETABMAX][2], fEtabMuI[ETABMAX][4], fEtabMuN[ETABMAX], fEtabToRePvI[ETABMAX];
-  float fEtabCharge[ETABMAX], fEtabPhi[ETABMAX], fEtabTheta[ETABMAX], fEtabEta[ETABMAX], fEtabRapidity[ETABMAX], fEtabP[ETABMAX], fEtabPt[ETABMAX], fEtabPx[ETABMAX], fEtabPy[ETABMAX], fEtabPz[ETABMAX], fEtabEnergy[ETABMAX], fEtabEt[ETABMAX], fEtabMass[ETABMAX], fEtabMt[ETABMAX], fEtabChi2[ETABMAX], fEtabNdof[ETABMAX], fEtabVx[ETABMAX], fEtabVy[ETABMAX], fEtabVz[ETABMAX], fEtabVxE[ETABMAX], fEtabVyE[ETABMAX], fEtabVzE[ETABMAX], fEtabVtxPhi[ETABMAX], fEtabVtxTheta[ETABMAX], fEtabVtxEta[ETABMAX], fEtabVtxRapidity[ETABMAX], fEtabVtxP[ETABMAX], fEtabVtxPt[ETABMAX], fEtabVtxPx[ETABMAX], fEtabVtxPy[ETABMAX], fEtabVtxPz[ETABMAX], fEtabVtxEnergy[ETABMAX], fEtabVtxEt[ETABMAX], fEtabVtxMass[ETABMAX], fEtabVtxMt[ETABMAX], fEtabCT[ETABMAX], fEtabCTxy[ETABMAX], fEtabVtxCT[ETABMAX], fEtabVtxCTxy[ETABMAX], fEtabJPsiDeltaL[ETABMAX], fEtabJPsiDeltaT[ETABMAX], fEtabJPsiVtxErr[ETABMAX], fEtabJPsiVtxErrxy[ETABMAX], fEtabJPsiProjX[ETABMAX][2], fEtabJPsiProjY[ETABMAX][2], fEtabJPsiProjZ[ETABMAX][2], fEtabJPsiCT[ETABMAX][2], fEtabJPsiCTxy[ETABMAX][2], fEtabJPsiToPVVtxErr[ETABMAX][2], fEtabJPsiToPVVtxErrxy[ETABMAX][2], fEtabJPsiVtxCT[ETABMAX][2], fEtabJPsiVtxCTxy[ETABMAX][2];
+  float fEtabCharge[ETABMAX], fEtabPhi[ETABMAX], fEtabTheta[ETABMAX], fEtabEta[ETABMAX], fEtabRapidity[ETABMAX], fEtabP[ETABMAX], fEtabPt[ETABMAX], fEtabPx[ETABMAX], fEtabPy[ETABMAX], fEtabPz[ETABMAX], fEtabEnergy[ETABMAX], fEtabEt[ETABMAX], fEtabMass[ETABMAX], fEtabMt[ETABMAX], fEtabChi2[ETABMAX], fEtabNdof[ETABMAX], fEtabVx[ETABMAX], fEtabVy[ETABMAX], fEtabVz[ETABMAX], fEtabVxE[ETABMAX], fEtabVyE[ETABMAX], fEtabVzE[ETABMAX], fEtabVtxPhi[ETABMAX], fEtabVtxTheta[ETABMAX], fEtabVtxEta[ETABMAX], fEtabVtxRapidity[ETABMAX], fEtabVtxP[ETABMAX], fEtabVtxPt[ETABMAX], fEtabVtxPx[ETABMAX], fEtabVtxPy[ETABMAX], fEtabVtxPz[ETABMAX], fEtabVtxEnergy[ETABMAX], fEtabVtxEt[ETABMAX], fEtabVtxMass[ETABMAX], fEtabVtxMt[ETABMAX], fEtabCT[ETABMAX], fEtabCTxy[ETABMAX], fEtabVtxCT[ETABMAX], fEtabVtxCTxy[ETABMAX], fEtabJPsiDeltaL[ETABMAX], fEtabJPsiDeltaT[ETABMAX], fEtabJPsiVtxErr[ETABMAX], fEtabJPsiVtxErrxy[ETABMAX], fEtabJPsiProjX[ETABMAX][2], fEtabJPsiProjY[ETABMAX][2], fEtabJPsiProjZ[ETABMAX][2], fEtabJPsiCT[ETABMAX][2], fEtabJPsiCTxy[ETABMAX][2], fEtabJPsiToPVVtxErr[ETABMAX][2], fEtabJPsiToPVVtxErrxy[ETABMAX][2], fEtabJPsiVtxCT[ETABMAX][2], fEtabJPsiVtxCTxy[ETABMAX][2], fEtabCombiVtxMass[ETABMAX], fEtabCombiChi2[ETABMAX], fEtabCombiNdof[ETABMAX], fJPsiCombi1Ndof[ETABMAX], fJPsiCombi1Chi2[ETABMAX], fJPsiCombi1VtxMass[ETABMAX],fJPsiCombi2Ndof[ETABMAX], fJPsiCombi2Chi2[ETABMAX], fJPsiCombi2VtxMass[ETABMAX];
   bool fEtabBasicFilter[ETABMAX], fEtabDJFilter[ETABMAX],fEtabUpsFilter[ETABMAX];
   // isolation information
-  int fEtabJPsiIsoTkN[ETABMAX][2], fEtabBestDJProbI, fEtabBestUpsProbI;
+  int fEtabJPsiIsoTkN[ETABMAX][2], fEtabBestDJProbI, fEtabBestUpsProbI, combimu1, combimu2, combimu3, combimu4;
   float fEtabJPsiIso7PV[ETABMAX][2], fEtabJPsiIsoTkCA[ETABMAX][2];
 
   // -- H->bb candidates
