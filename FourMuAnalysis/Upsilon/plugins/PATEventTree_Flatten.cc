@@ -1673,7 +1673,6 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
         if ((fJPsiVtxMass[fEtabJPsiI[ee][0]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75) || (fJPsiVtxMass[fEtabJPsiI[ee][1]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75)){
           fEtabUpsSoftModFilter[ee] = true;
         }
-        
       }
     }
     if( fJPsiSoftFilter[fEtabJPsiI[ee][0]] && fJPsiSoftFilter[fEtabJPsiI[ee][1]]){
