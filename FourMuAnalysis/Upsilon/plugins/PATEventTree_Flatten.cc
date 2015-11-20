@@ -1279,14 +1279,6 @@ void PATEventTree::fillDimuonCand(const reco::CompositeCandidateCollection& JPsi
     // set BaseJPsiI = index of highest Pt JPsi whose muons pass basic cuts
     if ( fBaseJPsiI[0]==-9999&&fJPsiMuI[fJPsiN][0]!=-9999&&fJPsiMuI[fJPsiN][1]!=-9999&&fJPsiMuCutSA[fJPsiN][0]&&fJPsiMuCutSA[fJPsiN][1]&&fJPsiMuCutTrk[fJPsiN][0]&&fJPsiMuCutTrk[fJPsiN][1]&&(fJPsiMuCutHLT[fJPsiN][0]||fJPsiMuCutHLT[fJPsiN][1]) ) fBaseJPsiI[0] = fJPsiN;
     else if ( fBaseJPsiI[0]!=-9999&&fBaseJPsiI[1]==-9999&&fJPsiMuI[fJPsiN][0]!=-9999&&fJPsiMuI[fJPsiN][1]!=-9999&&(fJPsiMuI[fJPsiN][0]!=fJPsiMuI[fBaseJPsiI[0]][0]&&fJPsiMuI[fJPsiN][0]!=fJPsiMuI[fBaseJPsiI[0]][1])&&(fJPsiMuI[fJPsiN][1]!=fJPsiMuI[fBaseJPsiI[0]][0]&&fJPsiMuI[fJPsiN][1]!=fJPsiMuI[fBaseJPsiI[0]][1])&&fJPsiMuCutSA[fJPsiN][0]&&fJPsiMuCutSA[fJPsiN][1]&&fJPsiMuCutTrk[fJPsiN][0]&&fJPsiMuCutTrk[fJPsiN][1]&&(fJPsiMuCutHLT[fJPsiN][0]||fJPsiMuCutHLT[fJPsiN][1]) ) fBaseJPsiI[1] = fJPsiN;
-    // veto jets if they have muon from JPsi
-    if( fJPsiMuCategory[fJPsiN][0]>0 && fJPsiMuCategory[fJPsiN][1]>0 && fJPsiMass[0]>2.8 && fJPsiMass[0]<3.35 ) {
-      for(int ij = 0; ij < fJtN; ij++) {
-        for(int ijt = 0; ijt < fJtTkN[ij]; ijt++) {
-          if( fJtToPc[ij][ijt]>=0 && (fJtToPc[ij][ijt]==fJPsiMuI[fJPsiN][0]||fJtToPc[ij][ijt]==fJPsiMuI[fJPsiN][1]) ) fJtVeto[ij]=true;
-        } // end loop over jet tracks
-      }  // end loop over jets
-    }
 
     // make J/Psi vertex from muons and fill vertex information
     vector<TransientTrack> mu_tks;
@@ -1654,10 +1646,10 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
     if( fJPsiBasicFilter[fEtabJPsiI[ee][0]] && fJPsiBasicFilter[fEtabJPsiI[ee][1]]){
       if( fEtabChi2[ee]!=-9999 && TMath::Prob(fEtabChi2[ee],fEtabNdof[ee])>0.005 ){
         fEtabBasicFilter[ee] = true;
-        if (fJPsiMass[fEtabJPsiI[ee][0]] > 2.85 && fJPsiMass[fEtabJPsiI[ee][0]] < 3.35 && fJPsiMass[fEtabJPsiI[ee][1]] > 2.85 && fJPsiMass[fEtabJPsiI[ee][1]] < 3.35){
+        if (fJPsiVtxMass[fEtabJPsiI[ee][0]] > 2.85 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 3.35 && fJPsiVtxMass[fEtabJPsiI[ee][1]] > 2.85 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 3.35){
           fEtabDJFilter[ee] = true;
         }
-        if ((fJPsiMass[fEtabJPsiI[ee][0]] > 9.1 && fJPsiMass[fEtabJPsiI[ee][0]] < 9.75 && fJPsiMass[fEtabJPsiI[ee][1]] < 9.75) || (fJPsiMass[fEtabJPsiI[ee][1]] > 9.1 && fJPsiMass[fEtabJPsiI[ee][1]] < 9.75 && fJPsiMass[fEtabJPsiI[ee][0]] < 9.75)){
+        if ((fJPsiVtxMass[fEtabJPsiI[ee][0]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75) || (fJPsiVtxMass[fEtabJPsiI[ee][1]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75)){
           fEtabUpsFilter[ee] = true;
         }
         
