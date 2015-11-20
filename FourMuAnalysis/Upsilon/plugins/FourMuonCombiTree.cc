@@ -1744,7 +1744,7 @@ void FourMuonCombiTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
           fJPsiCombi1VtxMass[ek]  = (float) dimucombi1_mom.mass();
         }
         if( dimucombi2_cand.isValid() ) {
-          reco::Vertex dimucombi2_vtx = dimucombi1_cand;
+          reco::Vertex dimucombi2_vtx = dimucombi2_cand;
           const math::XYZTLorentzVectorD dimucombi2_mom = dimucombi2_vtx.p4(0.1056583,0.0);
           fJPsiCombi2Chi2[ek]     = (float) dimucombi2_vtx.chi2();
           fJPsiCombi2Ndof[ek]     = (float) dimucombi2_vtx.ndof();
