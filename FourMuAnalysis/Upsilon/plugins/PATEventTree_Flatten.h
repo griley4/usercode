@@ -191,7 +191,7 @@ class PATEventTree : public edm::EDAnalyzer {
   bool fJPsiMuCutKin[JPsiMAX][2], fJPsiMuCutHLT[JPsiMAX][2], fJPsiMuCutIso[JPsiMAX][2], fJPsiMuCutSA[JPsiMAX][2], fJPsiMuCutTrk[JPsiMAX][2], fJPsiMuType[JPsiMAX][2][5], fJPsiBasicFilter[JPsiMAX];
 
   // -- Eta_b->2 J/Psi candidates
-  static const int ETABMAX = 200;
+  static const int ETABMAX = 500;
 
   int fEtabN, fBaseEtabI, EtabBestVtxProbI;
   int fEtabIndex[ETABMAX], fEtabDuplicatesI[ETABMAX], fEtabJPsiI[ETABMAX][2], fEtabMuI[ETABMAX][4], fEtabMuN[ETABMAX], fEtabToRePvI[ETABMAX];
