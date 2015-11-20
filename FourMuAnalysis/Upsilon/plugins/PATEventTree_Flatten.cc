@@ -256,7 +256,8 @@ void PATEventTree::beginJob() {
   fTree->Branch("JPsiVtxMt",       fJPsiVtxMt,        "JPsiVtxMt[JPsiN]/F");
 
   fTree->Branch("JPsiMuI",         fJPsiMuI,          "JPsiMuI[JPsiN][2]/I");
-  fTree->Branch("JPsiBasicFilter", fJPsiBasicFilter,	"JPsiBasicFilter[JPsiN]/O");
+  fTree->Branch("JPsiSoftFilter", fJPsiSoftFilter,	  "JPsiSoftFilter[JPsiN]/O");
+  fTree->Branch("JPsiSoftModFilter", fJPsiSoftModFilter,	  "JPsiSoftModFilter[JPsiN]/O");
   fTree->Branch("JPsiMuCategory",  fJPsiMuCategory,   "JPsiMuCategory[JPsiN][2]/I");
   fTree->Branch("JPsiMuCutKin",    fJPsiMuCutKin,     "JPsiMuCutKin[JPsiN][2]/O");
   fTree->Branch("JPsiMuCutHLT",    fJPsiMuCutHLT,     "JPsiMuCutHLT[JPsiN][2]/O");
@@ -303,11 +304,16 @@ void PATEventTree::beginJob() {
   fTree->Branch("EtabVtxEt",    fEtabVtxEt,     "EtabVtxEt[EtabN]/F");
   fTree->Branch("EtabVtxMass",  fEtabVtxMass,   "EtabVtxMass[EtabN]/F");
   fTree->Branch("EtabVtxMt",    fEtabVtxMt,     "EtabVtxMt[EtabN]/F");
-  fTree->Branch("EtabBestDJProbI",fEtabBestDJProbI,"EtabBestDJProbI/I");
-  fTree->Branch("EtabBestUpsProbI",fEtabBestUpsProbI,"EtabBestUpsProbI/I");
-  fTree->Branch("EtabBasicFilter", fEtabBasicFilter, "EtabBasicFilter[EtabN]/O");
-  fTree->Branch("EtabDJFilter", fEtabDJFilter, "EtabDJFilter[EtabN]/O");
-  fTree->Branch("EtabUpsFilter", fEtabUpsFilter, "EtabUpsFilter[EtabN]/O");
+  fTree->Branch("EtabBestDJSoftModProbI",fEtabBestDJSoftModProbI,"EtabBestDJSoftModProbI/I");
+  fTree->Branch("EtabBestUpsSoftModProbI",fEtabBestUpsSoftModProbI,"EtabBestUpsSoftModProbI/I");
+  fTree->Branch("EtabBestDJSoftProbI",fEtabBestDJSoftProbI,"EtabBestDJSoftProbI/I");
+  fTree->Branch("EtabBestUpsSoftProbI",fEtabBestUpsSoftProbI,"EtabBestUpsSoftProbI/I");
+  fTree->Branch("EtabSoftFilter", fEtabSoftFilter, "EtabSoftFilter[EtabN]/O");
+  fTree->Branch("EtabDJSoftFilter", fEtabDJSoftFilter, "EtabDJSoftFilter[EtabN]/O");
+  fTree->Branch("EtabUpsSoftFilter", fEtabUpsSoftFilter, "EtabUpsSoftFilter[EtabN]/O");
+  fTree->Branch("EtabSoftModFilter", fEtabSoftModFilter, "EtabSoftModFilter[EtabN]/O");
+  fTree->Branch("EtabDJSoftModFilter", fEtabDJSoftModFilter, "EtabDJSoftModFilter[EtabN]/O");
+  fTree->Branch("EtabUpsSoftModFilter", fEtabUpsSoftModFilter, "EtabUpsSoftModFilter[EtabN]/O");
   fTree->Branch("BaseEtabI",    &fBaseEtabI,    "BaseEtabI/I");
   fTree->Branch("EtabJPsiI",    fEtabJPsiI,     "EtabJPsiI[EtabN][2]/I");
   fTree->Branch("EtabMuI",      fEtabMuI,       "EtabMuI[EtabN][4]/I");
@@ -562,7 +568,7 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   // ----------------------------------------------------------------------
   if ( fJPsiN>1 ) makeEtabCand( t_tks );
 
-  if (fgsmmN>=4){
+  if (fgsmmN>=4 || fgsmN>=4){
     fTree->Fill();
   }
 }
@@ -1164,6 +1170,13 @@ void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std:
         && fPcD0[fPcN] < 0.3
         && fPcDz[fPcN] < 20.0)
     {fgoodSoftMuonMod[fMuN] = 1; fgsmmN++;}
+//    if ((fMuIsTracker[fMuN] || fMuIsGlobal[fMuN])
+//        && fPcPixLayN[fPcN] > 0 
+//        && fPcStripLayN[fPcN]>5 
+//        && fMuIsHighPurity[fMuN]
+//        && fPcD0[fPcN] < 0.3
+//        && fPcDz[fPcN] < 20.0)
+//    {fgoodSoftMuonMod[fMuN] = 1; fgsmmN++;}
     if (fMuIsGlobal[fMuN]
         && muons[fMuN].isPFMuon()
         && fMuChi2[fMuN] < 2
@@ -1326,10 +1339,16 @@ void PATEventTree::fillDimuonCand(const reco::CompositeCandidateCollection& JPsi
     fJPsiN++;
   } // end loop over JPsi candidates
   for(int jj=0; jj<fJPsiN; jj++){
-    fJPsiBasicFilter[jj] = false;
+    fJPsiSoftModFilter[jj] = false;
+    fJPsiSoftFilter[jj] = false;
     if( fgoodSoftMuonMod[fJPsiMuI[jj][0]] && fgoodSoftMuonMod[fJPsiMuI[jj][1]]){
       if( fJPsiChi2[jj]!=-9999 && TMath::Prob(fJPsiChi2[jj],fJPsiNdof[jj])>0.005 ) {
-        fJPsiBasicFilter[jj] = true;
+        fJPsiSoftModFilter[jj] = true;
+      }
+    }
+    if( fgoodSoftMuon[fJPsiMuI[jj][0]] && fgoodSoftMuon[fJPsiMuI[jj][1]]){
+      if( fJPsiChi2[jj]!=-9999 && TMath::Prob(fJPsiChi2[jj],fJPsiNdof[jj])>0.005 ) {
+        fJPsiSoftFilter[jj] = true;
       }
     }
   }
@@ -1639,32 +1658,52 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
     } // end loop over second dimu cand
   } // end loop over first dimu cand
   for(int ee=0; ee<fEtabN; ++ee){
-    fEtabBasicFilter[ee]=false;
-    fEtabDJFilter[ee]=false;
-    fEtabUpsFilter[ee]=false;
-    if( fJPsiBasicFilter[fEtabJPsiI[ee][0]] && fJPsiBasicFilter[fEtabJPsiI[ee][1]]){
+    fEtabSoftFilter[ee]=false;
+    fEtabSoftModFilter[ee]=false;
+    fEtabDJSoftFilter[ee]=false;
+    fEtabDJSoftModFilter[ee]=false;
+    fEtabUpsSoftFilter[ee]=false;
+    fEtabUpsSoftModFilter[ee]=false;
+    if( fJPsiSoftModFilter[fEtabJPsiI[ee][0]] && fJPsiSoftModFilter[fEtabJPsiI[ee][1]]){
       if( fEtabChi2[ee]!=-9999 && TMath::Prob(fEtabChi2[ee],fEtabNdof[ee])>0.005 ){
-        fEtabBasicFilter[ee] = true;
+        fEtabSoftModFilter[ee] = true;
         if (fJPsiVtxMass[fEtabJPsiI[ee][0]] > 2.85 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 3.35 && fJPsiVtxMass[fEtabJPsiI[ee][1]] > 2.85 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 3.35){
-          fEtabDJFilter[ee] = true;
+          fEtabDJSoftModFilter[ee] = true;
         }
         if ((fJPsiVtxMass[fEtabJPsiI[ee][0]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75) || (fJPsiVtxMass[fEtabJPsiI[ee][1]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75)){
-          fEtabUpsFilter[ee] = true;
+          fEtabUpsSoftModFilter[ee] = true;
+        }
+        
+      }
+    }
+    if( fJPsiSoftFilter[fEtabJPsiI[ee][0]] && fJPsiSoftFilter[fEtabJPsiI[ee][1]]){
+      if( fEtabChi2[ee]!=-9999 && TMath::Prob(fEtabChi2[ee],fEtabNdof[ee])>0.005 ){
+        fEtabSoftFilter[ee] = true;
+        if (fJPsiVtxMass[fEtabJPsiI[ee][0]] > 2.85 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 3.35 && fJPsiVtxMass[fEtabJPsiI[ee][1]] > 2.85 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 3.35){
+          fEtabDJSoftFilter[ee] = true;
+        }
+        if ((fJPsiVtxMass[fEtabJPsiI[ee][0]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75) || (fJPsiVtxMass[fEtabJPsiI[ee][1]] > 9.1 && fJPsiVtxMass[fEtabJPsiI[ee][1]] < 9.75 && fJPsiVtxMass[fEtabJPsiI[ee][0]] < 9.75)){
+          fEtabUpsSoftFilter[ee] = true;
         }
         
       }
     }
   }
-  fEtabBestDJProbI= -999;
-  fEtabBestUpsProbI = -999;
+  fEtabBestDJSoftProbI= -999;
+  fEtabBestUpsSoftProbI = -999;
+  fEtabBestUpsSoftModProbI = -999;
   bestProb = -999;
   bestProb1 = -999;
+  bestProb2 = -999;
   for(int ef=0; ef<fEtabN;++ef){
-    if( fEtabDJFilter[ef] && TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]) > bestProb ) { 
-      fEtabBestDJProbI = ef; bestProb = TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]);
+    if( fEtabDJSoftFilter[ef] && TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]) > bestProb ) { 
+      fEtabBestDJSoftProbI = ef; bestProb = TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]);
     }
-    if( fEtabUpsFilter[ef] && TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]) > bestProb1 ) { 
-      fEtabBestUpsProbI = ef; bestProb1 = TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]);
+    if( fEtabUpsSoftFilter[ef] && TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]) > bestProb1 ) { 
+      fEtabBestUpsSoftProbI = ef; bestProb1 = TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]);
+    }
+    if( fEtabUpsSoftModFilter[ef] && TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]) > bestProb2 ) { 
+      fEtabBestUpsSoftModProbI = ef; bestProb2 = TMath::Prob(fEtabChi2[ef],fEtabNdof[ef]);
     }
   }
 }
