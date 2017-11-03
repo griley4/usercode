@@ -16,7 +16,7 @@
 #include <vector>
 #include <bitset>
 
-#include "PATEventTree.h"
+#include "PATEventTree_Flatten.h"
 
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -54,23 +54,24 @@ PATEventTree::PATEventTree(edm::ParameterSet const& iConfig):
   fIsJPsiMuMu(iConfig.getUntrackedParameter<bool>("isJPsiMuMu", false)),
   fIsMC(iConfig.getUntrackedParameter<bool>("isMC", false)),
   fUseFatJets(iConfig.getUntrackedParameter<bool>("useFatJets", false)),
+  fHLTCollectionToken(consumes<pat::TriggerObjectStandAloneCollection>(iConfig.getUntrackedParameter<InputTag>("HLTCollectionLabel", edm::InputTag("patTrigger")))),
+  fPrimaryVertexCollectionToken(consumes<reco::VertexCollection>(iConfig.getUntrackedParameter<InputTag>("PrimaryVertexCollectionLabel", edm::InputTag("offlinePrimaryVertices")))),
+  fMuonCollectionToken(consumes<std::vector<pat::Muon> >(iConfig.getUntrackedParameter<InputTag>("MuonCollectionLabel", edm::InputTag("patMuonsWithTrigger")))),
+  fElectronCollectionToken(consumes<std::vector<pat::Electron> >(iConfig.getUntrackedParameter<InputTag>("ElectronCollectionLabel", edm::InputTag("cleanPatElectrons")))),
+  fPhotonCollectionToken(consumes<std::vector<pat::Photon> >(iConfig.getUntrackedParameter<InputTag>("PhotonCollectionLabel", edm::InputTag("cleanPatPhtons")))),
+  fTrackCollectionToken(consumes<std::vector<reco::Track> >(iConfig.getUntrackedParameter<InputTag>("TrackCollectionLabel", edm::InputTag("generalTracks")))),
+  fJetCollectionToken(consumes<std::vector<pat::Jet> >(iConfig.getUntrackedParameter<InputTag>("JetCollectionLabel", edm::InputTag("cleanPatJets")))),
+  fMETCollectionToken(consumes< pat::METCollection >(iConfig.getUntrackedParameter<InputTag>("METCollectionLabel", edm::InputTag("patMETsPF")))),
+  fJPsiInputToken(consumes< reco::MuonRefVector > (iConfig.getUntrackedParameter<InputTag>("JPsiInputLabel", edm::InputTag("goodMuons")))),
+  fJPsiCandToken(consumes< reco::CompositeCandidateCollection >(iConfig.getUntrackedParameter<InputTag>("JPsiCandLabel", edm::InputTag("JPsiToMuMu")))),
   fHLTPathLabel(iConfig.getUntrackedParameter<InputTag>("HLTPathLabel", edm::InputTag("TriggerResults::HLT"))),
   fHLTFilterLabel(iConfig.getUntrackedParameter<InputTag>("HLTFilterLabel", edm::InputTag("hltTriggerSummaryAOD"))),
-  fHLTCollectionLabel(iConfig.getUntrackedParameter<InputTag>("HLTCollectionLabel", edm::InputTag("patTrigger"))),
-  fPrimaryVertexCollectionLabel(iConfig.getUntrackedParameter<InputTag>("PrimaryVertexCollectionLabel", edm::InputTag("offlinePrimaryVertices"))),
-  fMuonCollectionLabel(iConfig.getUntrackedParameter<InputTag>("MuonCollectionLabel", edm::InputTag("patMuonsWithTrigger"))),
-  fElectronCollectionLabel(iConfig.getUntrackedParameter<InputTag>("ElectronCollectionLabel", edm::InputTag("cleanPatElectrons"))),
-  fPhotonCollectionLabel(iConfig.getUntrackedParameter<InputTag>("PhotonCollectionLabel", edm::InputTag("cleanPatPhotons"))),
   //fParticleCollectionLabel(iConfig.getUntrackedParameter<InputTag>("ParticleCollectionLabel", edm::InputTag("cleanPatTrackCands"))),
-  fTrackCollectionLabel(iConfig.getUntrackedParameter<InputTag>("TrackCollectionLabel", edm::InputTag("generalTracks"))),
-  fJetCollectionLabel(iConfig.getUntrackedParameter<InputTag>("JetCollectionLabel", edm::InputTag("cleanPatJets"))),
-  fMETCollectionLabel(iConfig.getUntrackedParameter<InputTag>("METCollectionLabel", edm::InputTag("patMETsPF"))),
   fGenCollectionLabel(iConfig.getUntrackedParameter<InputTag>("GenCollectionLabel", edm::InputTag("genParticles"))),
-  fJPsiCandLabel(iConfig.getUntrackedParameter<InputTag>("JPsiCandLabel", edm::InputTag("JPsiToMuMu"))),
   //fUpsilonCandLabel(iConfig.getUntrackedParameter<InputTag>("UpsilonCandLabel", edm::InputTag("UpsilonToMuMu"))),
-  fJPsiInputLabel(iConfig.getUntrackedParameter<InputTag>("JPsiInputLabel", edm::InputTag("goodMuons"))),
   fFatJetCollectionLabel(iConfig.getUntrackedParameter<std::vector<edm::InputTag> >("FatJetCollectionLabel")),
-  fInit(0)
+  fInit(0),
+  fHltPrescale(iConfig, consumesCollector(), *this)
 {
   string rcsid = string("$Id: PATEventTree.cc,v 1.00 2010/06/17 11:25:00 Exp $");
   cout << "----------------------------------------------------------------------" << endl;
@@ -79,13 +80,13 @@ PATEventTree::PATEventTree(edm::ParameterSet const& iConfig):
   cout << "---  rootFileName:                    " << fRootFileName << endl;
   cout << "---  isJPsiMuMu:                      " << fIsJPsiMuMu << endl;
   cout << "---  useFatJets:                      " << fUseFatJets << endl;
-  cout << "---  MuonCollectionLabel:             " << fMuonCollectionLabel << endl;
-  cout << "---  ElectronCollectionLabel:         " << fElectronCollectionLabel << endl;
-  cout << "---  PhotonCollectionLabel:           " << fPhotonCollectionLabel << endl;
+  //cout << "---  MuonCollectionLabel:             " << fMuonCollectionLabel << endl;
+  //cout << "---  ElectronCollectionLabel:         " << fElectronCollectionToken << endl;
+  //cout << "---  PhotonCollectionLabel:           " << fPhotonCollectionToken << endl;
   //cout << "---  ParticleCollectionLabel:         " << fParticleCollectionLabel << endl;
-  cout << "---  TrackCollectionLabel:            " << fTrackCollectionLabel << endl;
-  cout << "---  JetCollectionLabel:              " << fJetCollectionLabel << endl;
-  cout << "---  GenCollectionLabel:              " << fGenCollectionLabel << endl;
+  //cout << "---  TrackCollectionLabel:            " << fTrackCollectionLabel << endl;
+  //cout << "---  JetCollectionLabel:              " << fJetCollectionLabel << endl;
+  //cout << "---  GenCollectionLabel:              " << fGenCollectionLabel << endl;
   cout << "----------------------------------------------------------------------" << endl;
 
 }
@@ -140,6 +141,8 @@ void PATEventTree::beginJob() {
   fTree->Branch("HLTP_Dimuon0_Upsilon_Muon", fHLTP_Dimuon0_Upsilon_Muon, "HLTP_Dimuon0_Upsilon_Muon[3]/O");
   fTree->Branch("HLTP_Dimuon10_Jpsi_Barrel", fHLTP_Dimuon10_Jpsi_Barrel, "HLTP_Dimuon10_Jpsi_Barrel[3]/O");
   fTree->Branch("HLTP_TripleMu5",         fHLTP_TripleMu5,       "HLTP_TripleMu5[3]/O");
+  fTree->Branch("HLTP_QuadMuon0_Dimuon0_Jpsi", fHLTP_QuadMuon0_Dimuon0_Jpsi, "HLTP_QuadMuon0_Dimuon0_Jpsi[3]/O");
+  fTree->Branch("HLTP_QuadMuon0_Dimuon0_Upsilon", fHLTP_QuadMuon0_Dimuon0_Upsilon, "HLTP_QuadMuon0_Dimuon0_Upsilon[3]/O");
   fTree->Branch("HLTP_DoubleMu3_PS",         &fHLTP_DoubleMu3_PS,       "HLTP_DoubleMu3_PS/i");
   fTree->Branch("HLTP_DoubleMu6_PS",         &fHLTP_DoubleMu6_PS,       "HLTP_DoubleMu6_PS/i");
   fTree->Branch("HLTP_DoubleMu7_PS",         &fHLTP_DoubleMu7_PS,       "HLTP_DoubleMu7_PS/i");
@@ -148,10 +151,14 @@ void PATEventTree::beginJob() {
   fTree->Branch("HLTP_Dimuon0_Jpsi_PS",      &fHLTP_Dimuon0_Jpsi_PS,    "HLTP_Dimuon0_Jpsi_PS/i");
   fTree->Branch("HLTP_Dimuon10_Jpsi_Barrel_PS", &fHLTP_Dimuon10_Jpsi_Barrel_PS, "HLTP_Dimuon10_Jpsi_Barrel_PS/i");
   fTree->Branch("HLTP_TripleMu5_PS",         &fHLTP_TripleMu5_PS,       "HLTP_TripleMu5_PS/i");
+  fTree->Branch("HLTP_QuadMuon0_Dimuon0_Jpsi_PS", &fHLTP_QuadMuon0_Dimuon0_Jpsi_PS, "HLTP_QuadMuon0_Dimuon0_Jpsi_PS/i");
+  fTree->Branch("HLTP_QuadMuon0_Dimuon0_Upsilon_PS", &fHLTP_QuadMuon0_Dimuon0_Upsilon_PS, "HLTP_QuadMuon0_Dimuon0_Upsilon_PS/i");
   fTree->Branch("HLTP_DoubleMu3_Filters",    fHLTP_DoubleMu3_Filters,  "HLTP_DoubleMu3_Filters[5]/O");
   fTree->Branch("HLTP_DoubleMu6_Filters",    fHLTP_DoubleMu6_Filters,  "HLTP_DoubleMu6_Filters[5]/O");
   fTree->Branch("HLTP_DoubleMu7_Filters",    fHLTP_DoubleMu7_Filters,  "HLTP_DoubleMu7_Filters[5]/O");
   fTree->Branch("HLTP_TripleMu5_Filters",    fHLTP_TripleMu5_Filters,  "HLTP_TripleMu5_Filters[5]/O");
+  fTree->Branch("HLTP_QuadMuon0_Dimuon0_Jpsi_Filters", fHLTP_QuadMuon0_Dimuon0_Jpsi_Filters, "HLTP_QuadMuon0_Dimuon0_Jpsi_Filters[7]/O");
+  fTree->Branch("HLTP_QuadMuon0_Dimuon0_Upsilon_Filters", fHLTP_QuadMuon0_Dimuon0_Upsilon_Filters, "HLTP_QuadMuon0_Dimuon0_Upsilon_Filters[7]/O");
   fTree->Branch("HLTP_Dimuon0_Jpsi_Filters", fHLTP_Dimuon0_Jpsi_Filters, "HLTP_Dimuon0_Jpsi_Filters[7]/O");
   fTree->Branch("HLTP_Dimuon0_Jpsi_Muon_Filters", fHLTP_Dimuon0_Jpsi_Muon_Filters, "HLTP_Dimuon0_Jpsi_Muon_Filters[8]/O");
   fTree->Branch("HLTP_Dimuon0_Upsilon_Muon_Filters", fHLTP_Dimuon0_Upsilon_Muon_Filters, "HLTP_Dimuon0_Upsilon_Muon_Filters[8]/O");
@@ -195,6 +202,8 @@ void PATEventTree::beginJob() {
   fTree->Branch("HLT_Dimuon7_Jpsi_X_Barrel", fHLT_Dimuon7_Jpsi_X_Barrel, "HLT_Dimuon7_Jpsi_X_Barrel[HLTN][2]/O");
   fTree->Branch("HLT_Dimuon10_Jpsi_Barrel", fHLT_Dimuon10_Jpsi_Barrel, "HLT_Dimuon10_Jpsi_Barrel[HLTN][2]/O");
   fTree->Branch("HLT_TripleMu5", fHLT_TripleMu5, "HLT_TripleMu5[HLTN][2]/O");
+  fTree->Branch("HLT_QuadMuon0_Dimuon0_Jpsi", fHLT_QuadMuon0_Dimuon0_Jpsi, "HLT_QuadMuon0_Dimuon0_Jpsi[2]/O");
+  fTree->Branch("HLT_QuadMuon0_Dimuon0_Upsilon", fHLT_QuadMuon0_Dimuon0_Upsilon, "HLT_QuadMuon0_Dimuon0_Upsilon[2]/O");
   fTree->Branch("HLT_Jet",        fHLT_Jet,         "HLT_Jet[HLTN][2]/O");
 
   fTree->Branch("PcN",          &fPcN,          "PcN/I");
@@ -267,6 +276,8 @@ void PATEventTree::beginJob() {
   fTree->Branch("MuECALEnergy", fMuECALEnergy,  "MuECALEnergy[MuN]/F");
   fTree->Branch("MuHCALEnergy", fMuHCALEnergy,  "MuHCALEnergy[MuN]/F");
   fTree->Branch("MuCalCompat",  fMuCalCompat,   "MuCalCompat[MuN]/F");
+  fTree->Branch("MuIsGood",   fMuIsGood,    "MuIsGood[MuN]/O");
+  fTree->Branch("MuIsSoft",  fMuIsSoft,   "MuIsSoft[MuN]/O");
   fTree->Branch("MuIsGlobal",   fMuIsGlobal,    "MuIsGlobal[MuN]/O");
   fTree->Branch("MuIsTracker",  fMuIsTracker,   "MuIsTracker[MuN]/O");
   fTree->Branch("MuIsStandalone", fMuIsStandalone, "MuIsStandalone[MuN]/O");
@@ -703,27 +714,27 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   }
   edm::Handle< pat::TriggerObjectStandAloneCollection > HLTHandle;
   try{ 
-    iEvent.getByLabel(fHLTCollectionLabel, HLTHandle);
+    iEvent.getByToken(fHLTCollectionToken, HLTHandle);
   } catch (cms::Exception &ex) {
-    cout << "No HLT collection with label " << fHLTCollectionLabel << endl;
+    cout << "No HLT collection " << endl;
   }
   edm::Handle< std::vector<pat::Muon> > muonHandle;
   try{ 
-    iEvent.getByLabel(fMuonCollectionLabel, muonHandle);
+    iEvent.getByToken(fMuonCollectionToken, muonHandle);
   } catch (cms::Exception &ex) {
-    cout << "No muon collection with label " << fMuonCollectionLabel << endl;
+    cout << "No muon collection " << endl;
   }
   edm::Handle< std::vector<pat::Electron> > electronHandle;
   try{
-    iEvent.getByLabel(fElectronCollectionLabel, electronHandle);
+    iEvent.getByToken(fElectronCollectionToken, electronHandle);
   } catch (cms::Exception &ex) {
-    cout << "No electron collection with label " << fElectronCollectionLabel << endl;
+    cout << "No electron collection " << endl;
   }
   edm::Handle< std::vector<pat::Photon> > photonHandle;
   try{ 
-    iEvent.getByLabel(fPhotonCollectionLabel, photonHandle);
+    iEvent.getByToken(fPhotonCollectionToken, photonHandle);
   } catch (cms::Exception &ex) {
-    cout << "No photon collection with label " << fPhotonCollectionLabel << endl;
+    cout << "No photon collection " <<  endl;
   }
   /*edm::Handle< std::vector<pat::GenericParticle> > particleHandle;
   try{ 
@@ -733,21 +744,21 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   }*/
   edm::Handle< std::vector<reco::Track> > ctfTrackHandle;
   try{ 
-    iEvent.getByLabel(fTrackCollectionLabel, ctfTrackHandle);
+    iEvent.getByToken(fTrackCollectionToken, ctfTrackHandle);
   } catch (cms::Exception &ex) {
-    cout << "No ctf track collection with label " << fTrackCollectionLabel << endl;
+    cout << "No ctf track collection" << endl;
   }
   edm::Handle<reco::VertexCollection> pvHandle;
   try{ 
-    iEvent.getByLabel(fPrimaryVertexCollectionLabel, pvHandle);
+    iEvent.getByToken(fPrimaryVertexCollectionToken, pvHandle);
   } catch (cms::Exception &ex) {
-    cout << "No primary vertex collection with label " << fPrimaryVertexCollectionLabel << endl;
+    cout << "No primary vertex collection" << endl;
   }
   edm::Handle< std::vector<pat::Jet> > jetHandle;
   try{ 
-    iEvent.getByLabel(fJetCollectionLabel, jetHandle);
+    iEvent.getByToken(fJetCollectionToken, jetHandle);
   } catch (cms::Exception &ex) {
-    cout << "No jet collection with label " << fJetCollectionLabel << endl;
+    cout << "No jet collection with label " << endl;
   }
   std::vector< edm::Handle< std::vector<pat::Jet> > > fatJetHandle;
   if (fUseFatJets) {
@@ -763,21 +774,21 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   }
   edm::Handle< pat::METCollection > METHandle;
   try{ 
-    iEvent.getByLabel(fMETCollectionLabel, METHandle);
+    iEvent.getByToken(fMETCollectionToken, METHandle);
   } catch (cms::Exception &ex) {
-    cout << "No MET collection with label " << fMETCollectionLabel << endl;
+    cout << "No MET collection " << endl;
   }
   edm::Handle< reco::CompositeCandidateCollection > JPsiCandHandle;
   try{ 
-    iEvent.getByLabel(fJPsiCandLabel, JPsiCandHandle);
+    iEvent.getByToken(fJPsiCandToken, JPsiCandHandle);
   } catch (cms::Exception &ex) {
-    cout << "No composite candidate collection with label " << fJPsiCandLabel << endl;
+    cout << "No composite candidate collection with label "<< endl;
   }
   edm::Handle< reco::MuonRefVector > JPsiInputHandle;
   try{ 
-    iEvent.getByLabel(fJPsiInputLabel, JPsiInputHandle);
+    iEvent.getByToken(fJPsiInputToken, JPsiInputHandle);
   } catch (cms::Exception &ex) {
-    cout << "No muon ref collection with label " << fJPsiInputLabel << endl;
+    cout << "No muon ref collection " << endl;
   }
 
   fAllPvN = PVMAX;
@@ -788,6 +799,8 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   fGnN = GENMAX;
   ++nevt; 
   init();
+
+  cout << "Event info" << endl;
 
   // ----------------------------------------------------------------------
   // -- Event information
@@ -813,7 +826,7 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   fBz    = fabs(theMagneticField->inTesla(GlobalPoint(0,0,0)).z());
 
   // access HLT information from event
-  unsigned int psSet = fHltConfig.prescaleSet(iEvent, iSetup);
+  unsigned int psSet = fHltPrescale.prescaleSet(iEvent, iSetup);
   Handle<TriggerResults> hHLTresults;
   bool hltF = true;
   try {
@@ -840,11 +853,12 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   }
   if(hltF) triggerEvent = *(triggerEventHandle.product());
 
+
   // ----------------------------------------------------------------------
   // -- HLT path information
   // ----------------------------------------------------------------------
   if ( hltF ) fillHLTPath( psSet, hHLTresults, triggerEvent );
-  if ( fHLT_Skim && !(fHLTP_Dimuon0_Upsilon_Muon[1] || fHLTP_Dimuon0_Jpsi_Muon[1]) ) return; // only ntuplize events passing trigger if skimming enabled
+  if ( fHLT_Skim && !(fHLTP_Dimuon0_Upsilon_Muon[1] || fHLTP_Dimuon0_Jpsi_Muon[1] || fHLTP_QuadMuon0_Dimuon0_Jpsi[1] || fHLTP_QuadMuon0_Dimuon0_Upsilon[1]) ) return; // only ntuplize events passing trigger if skimming enabled
 
   // ----------------------------------------------------------------------
   // -- HLT objects
@@ -860,10 +874,11 @@ void PATEventTree::analyze(const edm::Event& iEvent,
     else { cout << "--> No valid gen collection" << endl; }
   }
 
+
   // ----------------------------------------------------------------------
   // -- Fill particles
   // ----------------------------------------------------------------------
-  if ( muonHandle.isValid() && electronHandle.isValid() && photonHandle.isValid() && ctfTrackHandle.isValid() ) fillParticles( *(muonHandle.product()), *(electronHandle.product()), *(photonHandle.product()), *(ctfTrackHandle.product()) );
+  if ( muonHandle.isValid() && electronHandle.isValid() && photonHandle.isValid() && ctfTrackHandle.isValid() ) fillParticles( *(muonHandle.product()), *(electronHandle.product()), *(photonHandle.product()), *(ctfTrackHandle.product()), *(pvHandle.product()) );
   else { cout << "--> Missing valid particle collection" << endl; }
   //if ( fTkN<2 ) return; // only look at events with at least 2 tracks
 
@@ -895,6 +910,7 @@ void PATEventTree::analyze(const edm::Event& iEvent,
     fPcIP[itk] = sqrt( (x1-px3)*(x1-px3)+(y1-py3)*(y1-py3)+(z1-pz3)*(z1-pz3) );
     fPcIPxy[itk] = sqrt( (x1-px3)*(x1-px3)+(y1-py3)*(y1-py3) );
   } // end loop over tracks
+
 
   // ----------------------------------------------------------------------
   // -- Jets
@@ -930,12 +946,12 @@ void PATEventTree::analyze(const edm::Event& iEvent,
     }
     jetDisambiguation();
   }
-
   // ----------------------------------------------------------------------
   // -- MET
   // ----------------------------------------------------------------------
   if ( METHandle.isValid() ) fillMET( *(METHandle.product()) );
   else { cout << "--> No valid MET collection" << endl; }
+
 
   // ----------------------------------------------------------------------
   // -- JPsi Candidates
@@ -955,6 +971,8 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   //if ( JPsiInputHandle.isValid() && ctfTrackHandle.isValid() ) makeJPsiMuTkCand( *(JPsiInputHandle.product()), *(ctfTrackHandle.product()), t_tks );
   //else { cout << "--> No valid JPsi cand. collection" << endl; }
   fJPsiMuTkN = fJPsiN-fJPsiMuMuN;
+
+  
 
   // ----------------------------------------------------------------------
   // -- Etab Candidates
@@ -1000,10 +1018,10 @@ void PATEventTree::init() {
     }
   }
 
-  fHLTP_DoubleMu3_PS = fHLTP_DoubleMu6_PS = fHLTP_DoubleMu7_PS = fHLTP_Dimuon0_Upsilon_Muon_PS = fHLTP_Dimuon0_Jpsi_Muon_PS = fHLTP_Dimuon0_Jpsi_PS = fHLTP_Dimuon10_Jpsi_Barrel_PS = fHLTP_TripleMu5_PS = 0;
+  fHLTP_DoubleMu3_PS = fHLTP_DoubleMu6_PS = fHLTP_DoubleMu7_PS = fHLTP_Dimuon0_Upsilon_Muon_PS = fHLTP_Dimuon0_Jpsi_Muon_PS = fHLTP_Dimuon0_Jpsi_PS = fHLTP_Dimuon10_Jpsi_Barrel_PS = fHLTP_TripleMu5_PS = fHLTP_QuadMuon0_Dimuon0_Jpsi_PS = fHLTP_QuadMuon0_Dimuon0_Upsilon_PS = 0;
 
   for (int i = 0; i < 3; i++) {
-    fHLTP_DoubleMu3[i] = fHLTP_DoubleMu6[i] = fHLTP_DoubleMu7[i] = fHLTP_Dimuon0_Upsilon_Muon[i] = fHLTP_Dimuon0_Jpsi_Muon[i] = fHLTP_Dimuon0_Jpsi[i] = fHLTP_Dimuon10_Jpsi_Barrel[i] = fHLTP_TripleMu5[i] = false;
+    fHLTP_DoubleMu3[i] = fHLTP_DoubleMu6[i] = fHLTP_DoubleMu7[i] = fHLTP_Dimuon0_Upsilon_Muon[i] = fHLTP_Dimuon0_Jpsi_Muon[i] = fHLTP_Dimuon0_Jpsi[i] = fHLTP_Dimuon10_Jpsi_Barrel[i] = fHLTP_TripleMu5[i] = fHLTP_QuadMuon0_Dimuon0_Jpsi[i] = fHLTP_QuadMuon0_Dimuon0_Upsilon[i] = false;
   }
 
   for (int i = 0; i < 5; i++) {
@@ -1025,7 +1043,7 @@ void PATEventTree::init() {
     fPcCharge[i] = fPcChi2[i] = fPcNdof[i] = fPcEnergy[i] = fPcEt[i] = fPcP[i] = fPcPt[i] = fPcPx[i] = fPcPy[i] = fPcPz[i] = fPcTheta[i] = fPcEta[i] = fPcPhi[i] = fPcD0[i] = fPcDz[i] = fPcEtaErr[i] = fPcPhiErr[i] = fPcD0Err[i] = fPcDzErr[i] = fPcVx[i] = fPcVy[i] = fPcVz[i] = fPcEcalIso[i] = fPcHcalIso[i] = fPcTrackIso[i] = fPcIP[i] = fPcIPxy[i] = -9999.;
     fPcJtN[i] = fPcPixHitN[i] = fPcPixLayN[i] = fPcStripHitN[i] = fPcStripLayN[i] = fMuHLTN[i] = fMuHitN[i] = fMuMatchedN[i] = fMuMatchedNSegArb[i]  = fMuMatchedNSegTrkArb[i] = fMuMatchedNSegTrkArbClean[i] = 0;
     fMuChi2[i] = fMuNdof[i] = fMuTkKink[i] = fMuGlbKink[i] = fMuGlbProb[i] = fMuTkSADist[i] = fMuTkSAdR[i] = fMuECALEnergy[i] = fMuHCALEnergy[i] = fMuCalCompat[i] = -9999.;
-    fMuIsGlobal[i] = fMuIsTracker[i] = fMuIsStandalone[i] = fMuIsCalo[i] = fMuArbitrated[i] = fMuLastStationLoose[i] = fMuLastStationTight[i] = fMu2DCompatibilityLoose[i] = fMu2DCompatibilityTight[i] = fMuOneStationLoose[i] = fMuOneStationTight[i] = fMuHLTMatch[i][0] = fMuHLTMatch[i][1] = fMuL3Match[i] = fMuTightMatch[i] = false;
+    fMuIsGood[i] = fMuIsSoft[i] = fMuIsGlobal[i] = fMuIsTracker[i] = fMuIsStandalone[i] = fMuIsCalo[i] = fMuArbitrated[i] = fMuLastStationLoose[i] = fMuLastStationTight[i] = fMu2DCompatibilityLoose[i] = fMu2DCompatibilityTight[i] = fMuOneStationLoose[i] = fMuOneStationTight[i] = fMuHLTMatch[i][0] = fMuHLTMatch[i][1] = fMuL3Match[i] = fMuTightMatch[i] = false;
     for (int j = 0; j < PARTTOJETMAX; j++) fPcToJt[i][j] = -9999;
   }
 
@@ -1148,6 +1166,16 @@ void PATEventTree::fillHLTPath(const unsigned int psSet, const edm::Handle<edm::
       fHLTP_TripleMu5[1] = accept;
       fHLTP_TripleMu5[2] = error;
       fHLTP_TripleMu5_PS = prescale;
+    } else if (validTriggerNames[itrig].find("HLT_QuadMuon0_Dimuon0_Jpsi_v")!=string::npos) {
+      fHLTP_QuadMuon0_Dimuon0_Jpsi[0] = wasrun;
+      fHLTP_QuadMuon0_Dimuon0_Jpsi[1] = accept;
+      fHLTP_QuadMuon0_Dimuon0_Jpsi[2] = error;
+      fHLTP_QuadMuon0_Dimuon0_Jpsi_PS = prescale;
+    } else if (validTriggerNames[itrig].find("HLT_QuadMuon0_Dimuon0_Upsilon_v")!=string::npos) {
+      fHLTP_QuadMuon0_Dimuon0_Upsilon[0] = wasrun;
+      fHLTP_QuadMuon0_Dimuon0_Upsilon[1] = accept;
+      fHLTP_QuadMuon0_Dimuon0_Upsilon[2] = error;
+      fHLTP_QuadMuon0_Dimuon0_Upsilon_PS = prescale;
     } else if (validTriggerNames[itrig].find("HLT_Dimuon0_Jpsi_v")!=string::npos) {
       fHLTP_Dimuon0_Jpsi[0] = wasrun;
       fHLTP_Dimuon0_Jpsi[1] = accept;
@@ -1284,12 +1312,15 @@ void PATEventTree::fillHLT(const pat::TriggerObjectStandAloneCollection& HLTObje
     if( HLTObjects[fHLTN].hasPathName("HLT_DoubleMu3_v7", false, false) ) fHLT_DoubleMu3[fHLTN][0] = true;
     if( HLTObjects[fHLTN].hasPathName("HLT_DoubleMu6_v5", false, false) ) fHLT_DoubleMu6[fHLTN][0] = true;
     if( HLTObjects[fHLTN].hasPathName("HLT_DoubleMu7_v5", false, false) ) fHLT_DoubleMu7[fHLTN][0] = true;
-    if( HLTObjects[fHLTN].hasPathName("HLT_Dimuon0_Jpsi_Muon_v4", false, false) ) fHLT_Dimuon0_Jpsi_Muon[fHLTN][0] = true;
+    if( HLTObjects[fHLTN].hasPathName("HLT_Dimuon0_Jpsi_Muon_v1", false, false) ) fHLT_Dimuon0_Jpsi_Muon[fHLTN][0] = true;
     if( HLTObjects[fHLTN].hasPathName("HLT_Dimuon0_Jpsi_v3", false, false) ) fHLT_Dimuon0_Jpsi[fHLTN][0] = true;
     if( HLTObjects[fHLTN].hasPathName("HLT_Dimuon7_Jpsi_Displaced_v3", false, false) ) fHLT_Dimuon7_Jpsi_Displaced[fHLTN][0] = true;
     if( HLTObjects[fHLTN].hasPathName("HLT_Dimuon10_Jpsi_Barrel_v3", false, false) ) fHLT_Dimuon10_Jpsi_Barrel[fHLTN][0] = true;
     if( HLTObjects[fHLTN].hasPathName("HLT_TripleMu5_v6", false, false) ) fHLT_TripleMu5[fHLTN][0] = true;
     if( HLTObjects[fHLTN].hasPathName("HLT_Dimuon7_Jpsi_X_Barrel_v3", false, false) ) fHLT_Dimuon7_Jpsi_X_Barrel[fHLTN][0] = true;
+    if( HLTObjects[fHLTN].hasPathName("HLT_QuadMuon0_Dimuon0_Jpsi_v1", false, false) ) fHLT_QuadMuon0_Dimuon0_Jpsi[fHLTN][0] = true;
+    if( HLTObjects[fHLTN].hasPathName("HLT_QuadMuon0_Dimuon0_Upsilon_v1", false, false) ) fHLT_QuadMuon0_Dimuon0_Upsilon[fHLTN][0] = true;
+
 
     if( HLTObjects[fHLTN].hasPathName("HLT_Mu12_v1", true, false) || HLTObjects[fHLTN].hasPathName("HLT_Mu12_v3", true, false) ) fHLT_Mu12[fHLTN][1] = fHLT_Mu[fHLTN][1] = true; 
     if( HLTObjects[fHLTN].hasPathName("HLT_Mu15_v2", true, false) || HLTObjects[fHLTN].hasPathName("HLT_Mu15_v4", true, false) ) fHLT_Mu15[fHLTN][1] = fHLT_Mu[fHLTN][1] = true; 
@@ -1311,7 +1342,9 @@ void PATEventTree::fillHLT(const pat::TriggerObjectStandAloneCollection& HLTObje
     if( HLTObjects[fHLTN].hasPathName("HLT_Dimuon10_Jpsi_Barrel_v3", true, false) ) fHLT_Dimuon10_Jpsi_Barrel[fHLTN][1] = true;
     if( HLTObjects[fHLTN].hasPathName("HLT_TripleMu5_v6", true, false) ) fHLT_TripleMu5[fHLTN][1] = true;
     if( HLTObjects[fHLTN].hasPathName("HLT_Dimuon7_Jpsi_X_Barrel_v3", true, false) ) fHLT_Dimuon7_Jpsi_X_Barrel[fHLTN][1] = true;
-
+    if( HLTObjects[fHLTN].hasPathName("HLT_QuadMuon0_Dimuon0_Jpsi_v1", true, false) ) fHLT_QuadMuon0_Dimuon0_Jpsi[fHLTN][0] = true;
+    if( HLTObjects[fHLTN].hasPathName("HLT_QuadMuon0_Dimuon0_Upsilon_v1", true, false) ) fHLT_QuadMuon0_Dimuon0_Upsilon[fHLTN][0] = \
+											    true;
     // See if Jet trigger was detected
     if(
       HLTObjects[fHLTN].hasPathName("HLT_Jet30_v1", false, false) ||
@@ -1445,7 +1478,7 @@ void PATEventTree::fillGen(const std::vector<GenParticle>& genColl) {
 }
 
 
-void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std::vector<pat::Electron>& electrons, const std::vector<pat::Photon>& photons, const std::vector<reco::Track>& ctftracks) {
+void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std::vector<pat::Electron>& electrons, const std::vector<pat::Photon>& photons, const std::vector<reco::Track>& ctftracks, const std::vector<Vertex>& vertices) {
 
   int TkI;  // the index of the underlying ctf track
   fTkN = (int) ctftracks.size();
@@ -1528,6 +1561,10 @@ void PATEventTree::fillParticles(const std::vector<pat::Muon>& muons, const std:
     fMuMatchedNSegArb[fMuN] = muons[fMuN].numberOfMatches(reco::Muon::SegmentArbitration);
     fMuMatchedNSegTrkArb[fMuN] = muons[fMuN].numberOfMatches(reco::Muon::SegmentAndTrackArbitration);
     fMuMatchedNSegTrkArbClean[fMuN] = muons[fMuN].numberOfMatches(reco::Muon::SegmentAndTrackArbitrationCleaned);
+//    fMuIsGood[fMuN] = muons[fMuN].isGoodMuon();
+    for(int iv = 0; iv < (int) vertices.size(); iv++){
+       if(muons[fMuN].isSoftMuon(vertices[iv])){
+	       fMuIsSoft[fMuN] =true;}}
     fMuIsGlobal[fMuN] = muons[fMuN].isGlobalMuon();
     fMuIsTracker[fMuN] = muons[fMuN].isTrackerMuon();
     fMuIsStandalone[fMuN] = muons[fMuN].isStandAloneMuon();
@@ -1815,7 +1852,6 @@ void PATEventTree::fillPrimaryVertices(const std::vector<Vertex>& vertices) {
 void PATEventTree::fillJets(const std::vector<pat::Jet>& jets) {
   // vectors of indices to be used for sorting jets by b-tag discriminator (highest to lowest)
   std::vector<int> rankTCHE, rankTCHP, rankP, rankBP, rankSSVHE, rankSSVHP, rankCSV, rankCSVMVA, rankGT, rankSE, rankSM;
-
   for (unsigned int i = 0; i < jets.size(); i++) {
     if (fJtN > JETMAX - 1) break;
 
@@ -1913,6 +1949,7 @@ void PATEventTree::fillJets(const std::vector<pat::Jet>& jets) {
     rankSE.insert( rankSE.begin()+fJtRankSE[fJtN],1,fJtN );
     rankSM.insert( rankSM.begin()+fJtRankSM[fJtN],1,fJtN );
 
+
     // HLT
     TriggerObjectStandAloneCollection JetHLTmatches = jets[i].triggerObjectMatches();
     if(JetHLTmatches.size() > 0) {
@@ -1953,7 +1990,6 @@ void PATEventTree::fillJets(const std::vector<pat::Jet>& jets) {
       if( fJtToPv[fJtN]>=0 && PvTkAssoc[j]>PvTkAssoc[fJtToPv[fJtN]] ) fJtToPv[fJtN] = j;
       else if( fJtToPv[fJtN]<0 && PvTkAssoc[j]>0 ) fJtToPv[fJtN] = j;
     }
-
     // Fill candidate (dR and PtRel) information
     float JtdRSum = 0.0, JtdPhi, JtdEta, JtdR;
     fJtdRMean[fJtN] = fJtdRMax[fJtN] = fJtPtRelMax[fJtN] = fJtPtRelSum[fJtN] = fJtPullPx[fJtN] = fJtPullPy[fJtN] = fJtPullPz[fJtN] = 0.0;
@@ -1979,18 +2015,16 @@ void PATEventTree::fillJets(const std::vector<pat::Jet>& jets) {
       fJtdRMean[fJtN] = JtdRSum/float(fJtnConstituents[fJtN]);
       fJtPtRelMean[fJtN] = fJtPtRelSum[fJtN]/float(fJtnConstituents[fJtN]);
     }
-
     //--------------------------------------------
     //-- Fill information for secondary vertices
     //--------------------------------------------
     // Simple secondary vertices
-    fillSecondaryVertices(*jets[i].tagInfoSecondaryVertex("secondaryVertex"), false);
+    //fillSecondaryVertices(*jets[i].tagInfoSecondaryVertex("secondaryVertex"), false);
     // Ghost track vertices
     //fillSecondaryVertices(*jets[i].tagInfoSecondaryVertex("ghostTrackVertex"), true);
-
     fJtN++;
   }
-
+  cout << "before rankstuff" << endl;
   fJtRankTCHE[fJtN] = fJtRankTCHP[fJtN] = fJtRankP[fJtN] = fJtRankBP[fJtN] = fJtRankSSVHE[fJtN] = fJtRankSSVHP[fJtN] = fJtRankCSV[fJtN] = fJtRankCSVMVA[fJtN] = fJtRankGT[fJtN] = fJtRankSE[fJtN] = fJtRankSM[fJtN] = fJtN;
   // 3rd: fill in finalized btag rankings using rank-ordered vectors
   for (int rank = fJtN-JtShift-1; rank >= 0; rank--) {
@@ -2013,16 +2047,20 @@ void PATEventTree::fillSecondaryVertices(const reco::SecondaryVertexTagInfo& svT
   // Sort Sv by distance
   std::map<float,int> globalIndex;
   std::vector<float> distSort;
-
+  cout << "tag info" << endl;
+	cout << svTagInfo.nVertices() << endl;
+  
   for(unsigned int isv = 0; isv < svTagInfo.nVertices(); isv++) {
     if( fSvN == SVMAX ) break;
+    cout << "here1b" << endl;
     const reco::Vertex &sv = svTagInfo.secondaryVertex(isv);
-
+    cout << "here1a" << endl;
     fSvIndex[fSvN] = fSvN;
     fSvTkN[fSvN] = (int) sv.tracksSize();
     fSvToJt[fSvN] = fJtN;
     if (IsGTV) fJtToGtv[fJtN][fJtGtvN[fJtN]] = fSvN;
     else fJtToSsv[fJtN][fJtSsvN[fJtN]] = fSvN;
+    cout << "here1b" <<endl;
     fSvX[fSvN] = (float) sv.x();
     fSvY[fSvN] = (float) sv.y();
     fSvZ[fSvN] = (float) sv.z();
@@ -2035,7 +2073,7 @@ void PATEventTree::fillSecondaryVertices(const reco::SecondaryVertexTagInfo& svT
     fSvDist[fSvN] = (float) svTagInfo.flightDistance(isv, true).value();
     distSort.push_back(fSvDist[fSvN]);
     globalIndex[fSvDist[fSvN]] = fSvN;
-
+    cout << "here2" << endl;
     math::XYZTLorentzVectorD svP4 = sv.p4(0.13957018,0);
     fSvPx[fSvN] = (float) svP4.px();
     fSvPy[fSvN] = (float) svP4.py();
@@ -2043,7 +2081,7 @@ void PATEventTree::fillSecondaryVertices(const reco::SecondaryVertexTagInfo& svT
     fSvPt[fSvN] = (float) svP4.pt();
     fSvEta[fSvN] = (float) -log(tan(0.5*acos(svP4.pz()/sqrt(svP4.px()*svP4.px()+svP4.py()*svP4.py()+svP4.pz()*svP4.pz()))));
     fSvMass[fSvN] = (float) svP4.M();
-
+    cout << "here3" << endl;
     int TkN = 0;
     // loop over all tracks in the vertex (assumes each track only links to one SV of each type)
     for(reco::Vertex::trackRef_iterator track = sv.tracks_begin(); track != sv.tracks_end(); ++track) {
@@ -2052,11 +2090,12 @@ void PATEventTree::fillSecondaryVertices(const reco::SecondaryVertexTagInfo& svT
       fSvToPc[fSvN][TkN] = fTkToPc[track->key()];
       TkN++;
     }
+    cout << "here4" << endl;
     if (IsGTV) { fJtGtvN[fJtN]++; fGtvN++; }
     else { fJtSsvN[fJtN]++; fSsvN++; }
     fSvN++;
   }
-
+  cout << "here5" << endl;
   // Sort Sv by distance
   std::sort(distSort.begin(), distSort.end());
   // Set Sv Dist and Tau using distance from PV if closest SV, distance from next closest SV otherwise
@@ -2524,19 +2563,13 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
 
         // find CT and CTxy
         if( fPvX[0]!=-9999 ) {
-          float xvecX, xvecY, xvecZ, pvecX, pvecY, pvecZ;
+          float xvecX, xvecY, xvecZ;
           xvecX = fEtabVx[fEtabN]-fPvX[0];
           xvecY = fEtabVy[fEtabN]-fPvY[0];
           xvecZ = fEtabVz[fEtabN]-fPvZ[0];
-          pvecX = fEtabPx[fEtabN];
-          pvecY = fEtabPy[fEtabN];
-          pvecZ = fEtabPz[fEtabN];
           fEtabCTxy[fEtabN] = (xvecX*fEtabPx[fEtabN]+xvecY*fEtabPy[fEtabN])/fEtabPt[fEtabN];
           fEtabCT[fEtabN] = (xvecX*fEtabPx[fEtabN]+xvecY*fEtabPy[fEtabN]+xvecZ*fEtabPz[fEtabN])/fEtabP[fEtabN];
           // using vtx kinematics
-          pvecX = fEtabVtxPx[fEtabN];
-          pvecY = fEtabVtxPy[fEtabN];
-          pvecZ = fEtabVtxPz[fEtabN];
           fEtabVtxCTxy[fEtabN] = (xvecX*fEtabVtxPx[fEtabN]+xvecY*fEtabVtxPy[fEtabN])/fEtabVtxPt[fEtabN];
           fEtabVtxCT[fEtabN] = (xvecX*fEtabVtxPx[fEtabN]+xvecY*fEtabVtxPy[fEtabN]+xvecZ*fEtabVtxPz[fEtabN])/fEtabVtxP[fEtabN];
 	}
@@ -3069,7 +3102,7 @@ void PATEventTree::fillTopology() {
   TVector3 nT(0,0,0);
   TVector3 nMinor(0,0,0);
   double Thrust_tmp = 0;
-  double highestNP=0;
+//  double highestNP=0;
 
   // Calculation of the Thrust
   for(unsigned int i=0; i<720; i++) { // iterate over Phi in half-degree increments
@@ -3087,7 +3120,6 @@ void PATEventTree::fillTopology() {
       Thrust_tmp = NP/P;
 
       if ( (float) Thrust_tmp > fEvThrust) {
-        highestNP = NP;
         n = n_tmp;
         fEvThrust = (float) Thrust_tmp;
       }
@@ -3108,7 +3140,6 @@ void PATEventTree::fillTopology() {
       Thrust_tmp = NP/P;
 
       if ( (float) Thrust_tmp > fEvThrust_Major) {
-        highestNP=NP;
         nT = n_tmp;
         fEvThrust_Major = (float) Thrust_tmp;
         nMinor = nT.Cross(n);

@@ -42,7 +42,7 @@
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
-
+#include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 
 using namespace reco;
 using namespace pat;
@@ -68,7 +68,7 @@ class PATEventTree : public edm::EDAnalyzer {
   void fillHLTPath(const unsigned int psSet, const edm::Handle<edm::TriggerResults>& hHLTresults, const trigger::TriggerEvent& triggerEvent);
   void fillHLT(const pat::TriggerObjectStandAloneCollection& HLTObjects);
   void fillPrimaryVertices(const std::vector<Vertex>& vertices);
-  void fillParticles(const std::vector<pat::Muon>& muons, const std::vector<pat::Electron>& electrons, const std::vector<pat::Photon>& photons, const std::vector<reco::Track>& ctftracks);
+  void fillParticles(const std::vector<pat::Muon>& muons, const std::vector<pat::Electron>& electrons, const std::vector<pat::Photon>& photons, const std::vector<reco::Track>& ctftracks, const std::vector<Vertex>& vertices);
   void fillJets(const std::vector<pat::Jet>& jets);
   void jetDisambiguation();
   void fillSecondaryVertices(const reco::SecondaryVertexTagInfo& svTagInfo, const bool IsGTV);
@@ -85,7 +85,17 @@ class PATEventTree : public edm::EDAnalyzer {
  private:
   std::string     fRootFileName;
   bool            fHLT_Skim, fIsEtabJPsi, fIsJPsiMuMu, fIsHBB, fIsMC, fUseFatJets;
-  edm::InputTag   fHLTPathLabel, fHLTFilterLabel, fHLTCollectionLabel, fPrimaryVertexCollectionLabel, fMuonCollectionLabel, fElectronCollectionLabel, fPhotonCollectionLabel, fTrackCollectionLabel, fJetCollectionLabel, fMETCollectionLabel, fGenCollectionLabel, fJPsiCandLabel, fJPsiInputLabel;
+  edm::EDGetTokenT< pat::TriggerObjectStandAloneCollection > fHLTCollectionToken;
+  edm::EDGetTokenT<reco::VertexCollection> fPrimaryVertexCollectionToken;
+  edm::EDGetTokenT<std::vector<pat::Muon> > fMuonCollectionToken;
+  edm::EDGetTokenT<std::vector<pat::Electron> > fElectronCollectionToken;
+  edm::EDGetTokenT<std::vector<pat::Photon> > fPhotonCollectionToken;
+  edm::EDGetTokenT<std::vector<reco::Track> > fTrackCollectionToken;
+  edm::EDGetTokenT<std::vector<pat::Jet> > fJetCollectionToken;
+  edm::EDGetTokenT<pat::METCollection > fMETCollectionToken;
+  edm::EDGetTokenT<reco::MuonRefVector > fJPsiInputToken;
+  edm::EDGetTokenT<reco::CompositeCandidateCollection > fJPsiCandToken;
+  edm::InputTag   fHLTPathLabel, fHLTFilterLabel, fGenCollectionLabel;
   std::vector<edm::InputTag> fFatJetCollectionLabel;
   edm::ESHandle<TransientTrackBuilder> theBuilder;
 
@@ -97,6 +107,7 @@ class PATEventTree : public edm::EDAnalyzer {
   bool  useEvent, fValidHLTConfig;
   int   nevt, fInit;
   HLTConfigProvider fHltConfig;
+  HLTPrescaleProvider fHltPrescale;
 
   // -- general stuff
   unsigned int fRun, fEvent, fLumiBlock;
@@ -109,18 +120,18 @@ class PATEventTree : public edm::EDAnalyzer {
   
   // -- HLT Path information taken directly from HLT (not PAT)
   // for the array: 0 = path was run or not, 1 = path passed or not, 2 = path encountered exception or not
-  bool  fHLTP_DoubleMu3[3], fHLTP_DoubleMu6[3], fHLTP_DoubleMu7[3],fHLTP_Dimuon0_Upsilon_Muon[3], fHLTP_Dimuon0_Jpsi_Muon[3], fHLTP_Dimuon0_Jpsi[3], fHLTP_Dimuon10_Jpsi_Barrel[3], fHLTP_TripleMu5[3];
+  bool  fHLTP_DoubleMu3[3], fHLTP_DoubleMu6[3], fHLTP_DoubleMu7[3],fHLTP_Dimuon0_Upsilon_Muon[3], fHLTP_Dimuon0_Jpsi_Muon[3], fHLTP_Dimuon0_Jpsi[3], fHLTP_Dimuon10_Jpsi_Barrel[3], fHLTP_TripleMu5[3], fHLTP_QuadMuon0_Dimuon0_Jpsi[3], fHLTP_QuadMuon0_Dimuon0_Upsilon[3];
   // HLT prescalersb
-  unsigned int fHLTP_DoubleMu3_PS, fHLTP_DoubleMu6_PS, fHLTP_DoubleMu7_PS,fHLTP_Dimuon0_Upsilon_Muon_PS, fHLTP_Dimuon0_Jpsi_Muon_PS, fHLTP_Dimuon0_Jpsi_PS, fHLTP_Dimuon10_Jpsi_Barrel_PS, fHLTP_TripleMu5_PS;
+  unsigned int fHLTP_DoubleMu3_PS, fHLTP_DoubleMu6_PS, fHLTP_DoubleMu7_PS,fHLTP_Dimuon0_Upsilon_Muon_PS, fHLTP_Dimuon0_Jpsi_Muon_PS, fHLTP_Dimuon0_Jpsi_PS, fHLTP_Dimuon10_Jpsi_Barrel_PS, fHLTP_TripleMu5_PS, fHLTP_QuadMuon0_Dimuon0_Jpsi_PS, fHLTP_QuadMuon0_Dimuon0_Upsilon_PS;
   // HLT filters passed
-  bool  fHLTP_DoubleMu3_Filters[5], fHLTP_DoubleMu6_Filters[5], fHLTP_DoubleMu7_Filters[5], fHLTP_TripleMu5_Filters[5], fHLTP_Dimuon0_Jpsi_Filters[7],fHLTP_Dimuon0_Upsilon_Muon_Filters[7], fHLTP_Dimuon0_Jpsi_Muon_Filters[8], fHLTP_Dimuon10_Jpsi_Barrel_Filters[7];
+  bool  fHLTP_DoubleMu3_Filters[5], fHLTP_DoubleMu6_Filters[5], fHLTP_DoubleMu7_Filters[5], fHLTP_TripleMu5_Filters[5], fHLTP_Dimuon0_Jpsi_Filters[7], fHLTP_QuadMuon0_Dimuon0_Jpsi_Filters[7], fHLTP_QuadMuon0_Dimuon0_Upsilon_Filters[7], fHLTP_Dimuon0_Upsilon_Muon_Filters[7], fHLTP_Dimuon0_Jpsi_Muon_Filters[8], fHLTP_Dimuon10_Jpsi_Barrel_Filters[7];
 
   // -- HLT objects from PAT
   static const int HLTMAX = 1000;
   int   fHLTN;
   int   fHLT_Index[HLTMAX], fHLT_ToPc[HLTMAX], fHLT_ToJt[HLTMAX], fHLT_PdgId[HLTMAX];
   float fHLT_Mass[HLTMAX], fHLT_Energy[HLTMAX], fHLT_Et[HLTMAX], fHLT_P[HLTMAX], fHLT_Pt[HLTMAX], fHLT_Px[HLTMAX], fHLT_Py[HLTMAX], fHLT_Pz[HLTMAX], fHLT_Theta[HLTMAX], fHLT_Eta[HLTMAX], fHLT_Phi[HLTMAX];
-  bool  fHLT_Mu[HLTMAX][2], fHLT_Mu12[HLTMAX][2], fHLT_Mu15[HLTMAX][2], fHLT_Mu20[HLTMAX][2], fHLT_Mu24[HLTMAX][2], fHLT_Mu30[HLTMAX][2], fHLT_IsoMu12[HLTMAX][2], fHLT_IsoMu15[HLTMAX][2], fHLT_IsoMu17[HLTMAX][2], fHLT_IsoMu24[HLTMAX][2], fHLT_IsoMu30[HLTMAX][2], fHLT_DoubleMu3[HLTMAX][2], fHLT_DoubleMu6[HLTMAX][2], fHLT_DoubleMu7[HLTMAX][2],fHLT_Dimuon0_Upsilon_Muon[HLTMAX][2], fHLT_Dimuon0_Jpsi_Muon[HLTMAX][2], fHLT_Dimuon0_Jpsi[HLTMAX][2], fHLT_Dimuon7_Jpsi_Displaced[HLTMAX][2], fHLT_Dimuon7_Jpsi_X_Barrel[HLTMAX][2], fHLT_Dimuon10_Jpsi_Barrel[HLTMAX][2], fHLT_TripleMu5[HLTMAX][2], fHLT_Jet[HLTMAX][2];
+  bool  fHLT_Mu[HLTMAX][2], fHLT_Mu12[HLTMAX][2], fHLT_Mu15[HLTMAX][2], fHLT_Mu20[HLTMAX][2], fHLT_Mu24[HLTMAX][2], fHLT_Mu30[HLTMAX][2], fHLT_IsoMu12[HLTMAX][2], fHLT_IsoMu15[HLTMAX][2], fHLT_IsoMu17[HLTMAX][2], fHLT_IsoMu24[HLTMAX][2], fHLT_IsoMu30[HLTMAX][2], fHLT_DoubleMu3[HLTMAX][2], fHLT_DoubleMu6[HLTMAX][2], fHLT_DoubleMu7[HLTMAX][2],fHLT_Dimuon0_Upsilon_Muon[HLTMAX][2], fHLT_Dimuon0_Jpsi_Muon[HLTMAX][2], fHLT_Dimuon0_Jpsi[HLTMAX][2], fHLT_Dimuon7_Jpsi_Displaced[HLTMAX][2], fHLT_Dimuon7_Jpsi_X_Barrel[HLTMAX][2], fHLT_Dimuon10_Jpsi_Barrel[HLTMAX][2], fHLT_TripleMu5[HLTMAX][2], fHLT_QuadMuon0_Dimuon0_Jpsi[HLTMAX][2], fHLT_QuadMuon0_Dimuon0_Upsilon[HLTMAX][2], fHLT_Jet[HLTMAX][2];
 
   // -- Particles
   static const int PARTMAX = 10000;
@@ -132,7 +143,7 @@ class PATEventTree : public edm::EDAnalyzer {
 //  IntMatrix fMuChambers[PARTMAX]; 
   int   fMuHitN[PARTMAX], fMuMatchedN[PARTMAX], fMuMatchedNSegArb[PARTMAX],fMuMatchedNSegTrkArb[PARTMAX],fMuMatchedNSegTrkArbClean[PARTMAX],fMuHLTN[PARTMAX], fMuToHLT[PARTMAX];
   float fMuChi2[PARTMAX], fMuNdof[PARTMAX], fMuTkKink[PARTMAX], fMuGlbKink[PARTMAX], fMuGlbProb[PARTMAX], fMuTkSADist[PARTMAX], fMuTkSAdR[PARTMAX], fMuECALEnergy[PARTMAX], fMuHCALEnergy[PARTMAX], fMuCalCompat[PARTMAX];
-  bool  fMuIsGlobal[PARTMAX], fMuIsTracker[PARTMAX], fMuIsStandalone[PARTMAX], fMuIsCalo[PARTMAX], fMuArbitrated[PARTMAX], fMuLastStationLoose[PARTMAX], fMuLastStationTight[PARTMAX], fMu2DCompatibilityLoose[PARTMAX], fMu2DCompatibilityTight[PARTMAX], fMuOneStationLoose[PARTMAX], fMuOneStationTight[PARTMAX], fMuHLTMatch[PARTMAX][2], fMuL3Match[PARTMAX], fMuTightMatch[PARTMAX];
+  bool  fMuIsGood[PARTMAX], fMuIsSoft[PARTMAX], fMuIsGlobal[PARTMAX], fMuIsTracker[PARTMAX], fMuIsStandalone[PARTMAX], fMuIsCalo[PARTMAX], fMuArbitrated[PARTMAX], fMuLastStationLoose[PARTMAX], fMuLastStationTight[PARTMAX], fMu2DCompatibilityLoose[PARTMAX], fMu2DCompatibilityTight[PARTMAX], fMuOneStationLoose[PARTMAX], fMuOneStationTight[PARTMAX], fMuHLTMatch[PARTMAX][2], fMuL3Match[PARTMAX], fMuTightMatch[PARTMAX];
 
   // -- Primary Vertices
   static const int PVMAX = 300;
