@@ -1,0 +1,296 @@
+{
+
+  float xsec_mass[8];
+  float xsec_pt[7];
+  float xsec_dy[8];
+  float xsec_y[9];
+  float pop_mass[8];
+  float pop_pt[7];
+  float pop_dy[8];
+  float pop_y[9];
+  float xsec_mass_err[8];
+  float xsec_pt_err[7];
+  float xsec_dy_err[8];
+  float xsec_y_err[9];
+
+  float binfit_plus5_mass[8];
+  float binfit_plus5_pt[7];
+  float binfit_plus5_dy[8];
+  float binfit_plus5_y[9];
+  float massbins[]={6.2,7,9,11,14,18,25,30,60};
+  float ptbins[]={0,7,12,16,20,25,50,80};
+  float dybins[]={0,0.2,0.4,0.6,0.9,1.3,1.8,2.4,4.5};
+  float ybins[]={0,0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8};
+  xsec_mass[0] = 0.04743199;        
+  xsec_mass[1] = 0.02288957;        
+  xsec_mass[2] = 0.01052911;        
+  xsec_mass[3] = 0.00729788;
+  xsec_mass[4] = 0.004679995;       
+  xsec_mass[5] = 0.002752399;       
+  xsec_mass[6] = 0.002321633;
+  xsec_mass[7] = 0.0004013286;
+  xsec_mass_err[0] = 0.006281533;
+  xsec_mass_err[1] = 0.002358319;
+  xsec_mass_err[2] = 0.001509835;
+  xsec_mass_err[3] = 0.001177612;
+  xsec_mass_err[4] = 0.0007126356;
+  xsec_mass_err[5] = 0.0003761611;
+  xsec_mass_err[6] = 0.0003408355;
+  xsec_mass_err[7] = 5.351047e-05;
+  xsec_pt[0] = 0.005511632;
+  xsec_pt[1] = 0.005816723;
+  xsec_pt[2] = 0.009881093;
+  xsec_pt[3] = 0.009516934;
+  xsec_pt[4] = 0.0057525;
+  xsec_pt[5] = 0.000676141;
+  xsec_pt[6] = 0.00006380682;
+  xsec_pt_err[0] = 0.0006928908;
+  xsec_pt_err[1] = 0.0009048236;
+  xsec_pt_err[2] = 0.001589567;
+  xsec_pt_err[3] = 0.001189617;
+  xsec_pt_err[4] = 0.000607507;
+  xsec_pt_err[5] = 0.00006;
+  xsec_pt_err[6] = 0.000018;
+  xsec_dy[0] = 0.3536836;
+  xsec_dy[1] = 0.2089763;
+  xsec_dy[2] = 0.100067;
+  xsec_dy[3] = 0.05972152;
+  xsec_dy[4] = 0.03928412;
+  xsec_dy[5] = 0.02376292;
+  xsec_dy[6] = 0.02276975;
+  xsec_dy[7] = 0.01052381;
+  xsec_dy_err[0] = 0.02861261;
+  xsec_dy_err[1] = 0.02171715;
+  xsec_dy_err[2] = 0.01411659;
+  xsec_dy_err[3] = 0.01030196;
+  xsec_dy_err[4] = 0.00684666;
+  xsec_dy_err[5] = 0.005372485;
+  xsec_dy_err[6] = 0.00464503;
+  xsec_dy_err[7] = 0.002287784;
+  std::cout<<"he3re"<<std::endl;
+  xsec_y[0] = 0.09687107;
+  xsec_y[1] = 0.1105371;
+  xsec_y[2] = 0.08927423;
+  xsec_y[3] = 0.1018527;
+  xsec_y[4] = 0.07761347;
+  xsec_y[5] = 0.0957653;
+  xsec_y[6] = 0.1376607;
+  xsec_y[7] = 0.1684277;
+  xsec_y[8] = 0.1205354;
+  xsec_y_err[0] = 0.01497098;
+  xsec_y_err[1] = 0.01567618;
+  xsec_y_err[2] = 0.0123992;
+  xsec_y_err[3] = 0.0136379;
+  xsec_y_err[4] = 0.01098304;
+  xsec_y_err[5] = 0.01426708;
+  xsec_y_err[6] = 0.01744995;
+  xsec_y_err[7] = 0.02301054;
+  xsec_y_err[8] = 0.0227678;
+
+  pop_mass[0] = 74;
+  pop_mass[1] = 99;
+  pop_mass[2] = 53;
+  pop_mass[3] = 44;
+  pop_mass[4] = 44;
+  pop_mass[5] = 60;
+  pop_mass[6] = 47;
+  pop_mass[7] = 63;
+  pop_pt[0] = 70;
+  pop_pt[1] = 45;
+  pop_pt[2] = 46;
+  pop_pt[3] = 72;
+  pop_pt[4] = 107;
+  pop_pt[5] = 127;
+  pop_pt[6] = 13.5;
+  pop_dy[1] = 178;
+  pop_dy[2] = 102;
+  pop_dy[3] = 56;
+  pop_dy[4] = 40;
+  pop_dy[5] = 35;
+  pop_dy[6] = 23;
+  pop_dy[7] = 25;
+  pop_dy[8] = 23;
+  pop_y[0] = 44;
+  pop_y[1] = 55;
+  pop_y[2] = 54;
+  pop_y[3] = 59;
+  pop_y[4] = 53;
+  pop_y[5] = 49;
+  pop_y[6] = 71;
+  pop_y[7] = 71;
+  pop_y[8] = 36;
+  binfit_plus5_mass[0] = 0.04772042;
+  binfit_plus5_mass[1] = 0.02303926;
+  binfit_plus5_mass[2] = 0.01063514;
+  binfit_plus5_mass[3] = 0.007453869;
+  binfit_plus5_mass[4] = 0.004836356;
+  binfit_plus5_mass[5] = 0.002857256;
+  binfit_plus5_mass[6] = 0.002504349;
+  binfit_plus5_mass[7] = 0.0003378739;
+  binfit_plus5_pt[0] = 0.005706818;
+  binfit_plus5_pt[1] = 0.00608742;
+  binfit_plus5_pt[2] = 0.01006418;
+  binfit_plus5_pt[3] = 0.009523273;
+  binfit_plus5_pt[4] = 0.005761037;
+  binfit_plus5_pt[5] = 0.000678;
+  binfit_plus5_pt[6] = 0.00006380682;
+  binfit_plus5_dy[0] = 0.3575782;
+  binfit_plus5_dy[1] = 0.2118519;
+  binfit_plus5_dy[2] = 0.1014876;
+  binfit_plus5_dy[3] = 0.06084597;
+  binfit_plus5_dy[4] = 0.04031759;
+  binfit_plus5_dy[5] = 0.02449213;
+  binfit_plus5_dy[6] = 0.02255733;
+  binfit_plus5_dy[7] = 0.01138156;
+  binfit_plus5_y[0] = 0.1041358;
+  binfit_plus5_y[1] = 0.116048;
+  binfit_plus5_y[2] = 0.09236936;
+  binfit_plus5_y[3] = 0.1046199;
+  binfit_plus5_y[4] = 0.07948587;
+  binfit_plus5_y[5] = 0.09706181;
+  binfit_plus5_y[6] = 0.1398772;
+  binfit_plus5_y[7] = 0.1716835;
+  binfit_plus5_y[8] = 0.1228601;
+  
+  float tp_mass[9];
+  float tp_pt[7];
+  float tp_dy[8];
+  float tp_y[9];
+  tp_mass[0] = 0.226;
+  tp_mass[1] = 0.195;
+  tp_mass[2] = 0.185;
+  tp_mass[3] = 0.195;
+  tp_mass[4] = 0.228;
+  tp_mass[5] = 0.250;
+  tp_mass[6] = 0.187;
+  tp_mass[7] = 0.160;
+  tp_pt[0] = 0.243;
+  tp_pt[1] = 0.227;
+  tp_pt[2] = 0.263;
+  tp_pt[3] = 0.262;
+  tp_pt[4] = 0.200;
+  tp_pt[5] = 0.145;
+  tp_pt[6] = 0.074;
+  tp_dy[0] = 0.202;
+  tp_dy[1] = 0.198;
+  tp_dy[2] = 0.219;
+  tp_dy[3] = 0.186;
+  tp_dy[4] = 0.174;
+  tp_dy[5] = 0.158;
+  tp_dy[6] = 0.256;
+  tp_dy[7] = 0.253;
+  tp_y[0] = 0.179;
+  tp_y[1] = 0.177;
+  tp_y[2] = 0.167;
+  tp_y[3] = 0.159;
+  tp_y[4] = 0.176;
+  tp_y[5] = 0.205;
+  tp_y[6] = 0.280;
+  tp_y[7] = 0.273;
+  tp_y[8] = 0.164;
+  float PerBinFixed = 0.01;
+  float Bkg2P = 0.022;
+  float SigCB = 0.01;
+  float JAcc = 0.019;
+  float unc_mass[8]; 
+  float unc_mass2[8]; 
+  float unc_pt[7]; 
+  float unc_pt2[7]; 
+  float unc_dy[8]; 
+  float unc_y[9]; 
+  float tot_stat_mass;
+  float tot_syst_mass;
+  float tot_syst_mass2;
+  float tot_stat_pt;
+  float tot_syst_pt;
+  float tot_syst_pt2;
+  float tot_stat_dy;
+  float tot_syst_dy;
+  float tot_stat_y;
+  float tot_syst_y;
+  float tot_mass=0;
+  float tot_pt;
+  float tot_dy;
+  float tot_y;
+  float tot_mass_n=0;
+  float tot_pt_n;
+  float tot_dy_n;
+  float tot_y_n;
+  float tot_tp_mass=0;
+  float tot_tp_pt;
+  float tot_tp_dy;
+  float tot_tp_y;
+  float tot_bf_mass=0;
+  float tot_bf_pt;
+  float tot_bf_dy;
+  float tot_bf_y;
+  
+
+  std::cout<<"here"<<std::endl;
+  for (int i=0; i<8;++i){
+    unc_mass[i] = sqrt(pow(binfit_plus5_mass[i]-xsec_mass[i],2)+pow(PerBinFixed*xsec_mass[i],2)+pow(Bkg2P*xsec_mass[i],2)+pow(SigCB*xsec_mass[i],2)+pow(JAcc*xsec_mass[i],2)+pow(0.5*tp_mass[i]*xsec_mass[i],2));
+    std::cout<<"Mass Bin: "<<i+1<<" Cross Section systematic: "<<xsec_mass[i]<<" +/- "<<xsec_mass_err[i]<<" +/- "<<unc_mass[i]<<" which is "<<xsec_mass_err[i]/xsec_mass[i]<<" & "<<unc_mass[i]/xsec_mass[i]<<" % relative unc"<<" and "<<sqrt(pow(xsec_mass_err[i],2)+pow(unc_mass[i],2))<<" total unc"<<std::endl; 
+  }
+  for (int i=0; i<8;++i){
+   tot_mass_n += pop_mass[i];
+   tot_mass += xsec_mass[i] * (massbins[i+1]-massbins[i]);
+   tot_stat_mass += pow(xsec_mass_err[i]* (massbins[i+1]-massbins[i]),2);
+   tot_syst_mass += (unc_mass[i]/xsec_mass[i])*pop_mass[i];
+   tot_tp_mass += (0.5*tp_mass[i])*pop_mass[i];
+   tot_bf_mass += ((binfit_plus5_mass[i]-xsec_mass[i])/xsec_mass[i])*pop_mass[i];
+  }
+  std::cout<<" Total Stat : Syst : "<< tot_mass<<" "<<sqrt(tot_stat_mass) <<" " <<(tot_syst_mass/tot_mass_n)*tot_mass<<" Relative: "<<sqrt(tot_stat_mass)/tot_mass<<"  "<<tot_syst_mass/tot_mass_n<<" "<<"TnP: "<<tot_tp_mass/tot_mass_n<<" BnFit: "<<tot_bf_mass/tot_mass_n<<std::endl;
+  for (int i=0; i<8;++i){ //mass 2 fitting relative per bin instead of absolute like above
+    unc_mass2[i] = sqrt(pow((binfit_plus5_mass[i]-xsec_mass[i])/xsec_mass[i],2)+pow(PerBinFixed,2)+pow(Bkg2P,2)+pow(SigCB,2)+pow(JAcc,2)+pow(0.5*tp_mass[i],2));
+    std::cout<<"Mass Bin: "<<i+1<<" Cross Section systematic: "<<xsec_mass[i]<<" +/- "<<xsec_mass_err[i]<<" +/- "<<unc_mass2[i]*xsec_mass[i]<<" which is "<<xsec_mass_err[i]/xsec_mass[i]<<" & "<<unc_mass2[i]<<" % relative unc"<<" and "<<sqrt(pow(xsec_mass_err[i],2)+pow(unc_mass[i],2))<<" total unc"<<std::endl; 
+  }
+  for (int i=0; i<8;++i){
+   tot_syst_mass2 += (unc_mass2[i])*pop_mass[i];
+  }
+  std::cout<<" Total Stat : Syst : "<< tot_mass<<" "<<sqrt(tot_stat_mass) <<" " <<(tot_syst_mass2/tot_mass_n)*tot_mass<<" Relative: "<<sqrt(tot_stat_mass)/tot_mass<<"  "<<tot_syst_mass2/tot_mass_n<<" "<<"TnP: "<<tot_tp_mass/tot_mass_n<<" BnFit: "<<tot_bf_mass/tot_mass_n<<std::endl;
+    for (int i=0; i<7;++i){
+    unc_pt[i] = sqrt(pow(abs(binfit_plus5_pt[i]-xsec_pt[i])/(xsec_pt[i]),2)+pow(PerBinFixed,2)+pow(Bkg2P,2)+pow(SigCB,2)+pow(JAcc,2)+pow(0.5*tp_pt[i],2));
+    //unc_pt[i] = sqrt(pow(abs(binfit_plus5_pt[i]-xsec_pt[i])/(0.5*(binfit_plus5_pt[i]+xsec_pt[i])),2)+pow(PerBinFixed,2)+pow(Bkg2P,2)+pow(SigCB,2)+pow(JAcc,2)+pow(0.5*tp_pt[i],2));
+    //std::cout<<"pT Bin: "<<i+1<<" Cross Section systematic: "<<xsec_pt[i]<<" +/- "<<xsec_pt_err[i]<<" +/- "<<unc_pt[i]*xsec_pt[i]<<" which is "<<xsec_pt_err[i]/xsec_pt[i]<<" & "<<unc_pt[i]<<" % relative unc"<<std::endl; 
+    unc_pt2[i] = sqrt(pow(binfit_plus5_pt[i]-xsec_pt[i],2)+pow(PerBinFixed*xsec_pt[i],2)+pow(Bkg2P*xsec_pt[i],2)+pow(SigCB*xsec_pt[i],2)+pow(JAcc*xsec_pt[i],2)+pow(0.5*tp_pt[i]*xsec_pt[i],2));
+    std::cout<<"pT2 Bin: "<<i+1<<" Cross Section systematic: "<<xsec_pt[i]<<" +/- "<<xsec_pt_err[i]<<" +/- "<<unc_pt2[i]<<" which is "<<xsec_pt_err[i]/xsec_pt[i]<<" & "<<unc_pt2[i]/xsec_pt[i]<<" % relative unc"<<" and "<<sqrt(pow(xsec_pt_err[i],2)+pow(unc_pt2[i],2))<<" total unc"<<std::endl; 
+    }
+  for (int i=0; i<7;++i){
+   tot_pt_n += pop_pt[i];
+   tot_stat_pt += pow(xsec_pt_err[i]* (ptbins[i+1]-ptbins[i]),2);
+   tot_syst_pt += pow((unc_pt[i]*xsec_pt[i])*(ptbins[i+1]-ptbins[i]),2);
+   tot_syst_pt2 += (unc_pt2[i]/xsec_pt[i])*pop_pt[i];
+   tot_pt += xsec_pt[i] * (ptbins[i+1]-ptbins[i]);
+   tot_tp_pt += (0.5*tp_pt[i])*pop_pt[i];
+   tot_bf_pt += sqrt(pow(binfit_plus5_pt[i]-xsec_pt[i],2))/xsec_pt[i]*pop_pt[i];
+  }
+  //std::cout<<" Total Stat : Syst : "<< sqrt(tot_stat_pt) <<" " <<sqrt(tot_syst_pt)<<std::endl;
+  //std::cout<<" Total Stat : Syst : "<< tot_pt<<" "<<sqrt(tot_stat_pt) <<" " <<sqrt(tot_syst_pt)<<" Relative: "<<sqrt(tot_stat_pt)/tot_pt<<"  "<<sqrt(tot_syst_pt)/tot_pt<<std::endl;
+  std::cout<<" Total Stat : Syst : "<< tot_pt<<" "<<sqrt(tot_stat_pt) <<" " <<(tot_syst_pt2/tot_pt_n)*tot_pt<<" Relative: "<<sqrt(tot_stat_pt)/tot_pt<<"  "<<(tot_syst_pt2/tot_pt_n)<<" "<<"TnP: "<<tot_tp_pt/tot_pt_n<<" BnFit: "<<tot_bf_pt/tot_pt_n<<std::endl;
+    for (int i=0; i<8;++i){
+    unc_dy[i] = sqrt(pow(binfit_plus5_dy[i]-xsec_dy[i],2)+pow(PerBinFixed*xsec_dy[i],2)+pow(Bkg2P*xsec_dy[i],2)+pow(SigCB*xsec_dy[i],2)+pow(JAcc*xsec_dy[i],2)+pow(0.5*tp_dy[i]*xsec_dy[i],2));
+    std::cout<<"dY Bin: "<<i+1<<" Cross Section systematic: "<<xsec_dy[i]<<" +/- "<<xsec_dy_err[i]<<" +/- "<<unc_dy[i]<<" which is "<<xsec_dy_err[i]/xsec_dy[i]<<" & "<<unc_dy[i]/xsec_dy[i]<<" % relative unc"<<" and "<<sqrt(pow(xsec_dy_err[i],2)+pow(unc_dy[i],2))<<" total unc"<<std::endl; 
+    }
+  for (int i=0; i<8;++i){
+   tot_dy_n += pop_dy[i];
+   tot_stat_dy += pow((xsec_dy_err[i])* (dybins[i+1]-dybins[i]),2);
+   tot_syst_dy += (unc_dy[i]/xsec_dy[i])*pop_dy[i];
+   tot_dy += xsec_dy[i] * (dybins[i+1]-dybins[i]);
+   tot_tp_dy += (0.5*tp_dy[i])*pop_dy[i];
+   tot_bf_dy += sqrt(pow(binfit_plus5_dy[i]-xsec_dy[i],2))/xsec_dy[i]*pop_dy[i];
+  }
+  std::cout<<" Total Stat : Syst : "<< tot_dy<<" "<<sqrt(tot_stat_dy) <<" " <<(tot_syst_dy/tot_dy_n)*tot_dy<<" Relative: "<<sqrt(tot_stat_dy)/tot_dy<<"  "<<(tot_syst_dy/tot_dy_n)<<" "<<"TnP: "<<tot_tp_dy/tot_dy_n<<" BnFit: "<<tot_bf_dy/tot_dy_n<<std::endl;
+    for (int i=0; i<9;++i){
+    unc_y[i] = sqrt(pow(binfit_plus5_y[i]-xsec_y[i],2)+pow(PerBinFixed*xsec_y[i],2)+pow(Bkg2P*xsec_y[i],2)+pow(SigCB*xsec_y[i],2)+pow(JAcc*xsec_y[i],2)+pow(0.5*tp_y[i]*xsec_y[i],2));
+    std::cout<<"Y Bin: "<<i+1<<" Cross Section systematic: "<<xsec_y[i]<<" +/- "<<xsec_y_err[i]<<" +/- "<<unc_y[i]<<" which is "<<xsec_y_err[i]/xsec_y[i]<<" & "<<unc_y[i]/xsec_y[i]<<" % relative unc"<<" and "<<sqrt(pow(xsec_y_err[i],2)+pow(unc_y[i],2))<<" total unc"<<std::endl; 
+  }
+  for (int i=0; i<9;++i){
+   tot_y_n += pop_y[i];
+   tot_stat_y += pow((xsec_y_err[i])* (ybins[i+1]-ybins[i]),2);
+   tot_syst_y += (unc_y[i]/xsec_y[i])*pop_y[i];
+   tot_y += xsec_y[i] * (ybins[i+1]-ybins[i]);
+   tot_tp_y += (0.5*tp_y[i])*pop_y[i];
+   tot_bf_y += sqrt(pow(binfit_plus5_y[i]-xsec_y[i],2))/xsec_y[i]*pop_y[i];
+  }
+  std::cout<<" Total Stat : Syst : "<< tot_y<<" "<<sqrt(tot_stat_y) <<" " <<(tot_syst_y/tot_y_n)*tot_y<<" Relative: "<<sqrt(tot_stat_y)/tot_y<<"  "<<(tot_syst_y/tot_y_n)<<" "<<"TnP: "<<tot_tp_y/tot_y_n<<" BnFit: "<<tot_bf_y/tot_y_n<<std::endl;
+}
