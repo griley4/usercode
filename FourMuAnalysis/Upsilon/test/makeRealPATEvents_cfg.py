@@ -16,7 +16,7 @@ process.source = cms.Source("PoolSource",
 #  '/store/data/Run2011B/MuOnia/AOD/PromptReco-v1/000/178/078/06BDD33D-28F3-E011-A739-003048CF9B28.root',	
 )
 ## Maximal Number of Events
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
 
 ## Geometry and Detector Conditions (needed for a few patTuple production steps)
 process.load('Configuration.StandardSequences.GeometryDB_cff')
