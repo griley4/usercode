@@ -994,7 +994,7 @@ void PATEventTree::analyze(const edm::Event& iEvent,
 
   fillTopology();
   if ( fIsJPsiMuMu&&(fJPsiI[0]==-9999&&fJPsiI[1]==-9999) ) return; // return if no MC JPsi found for expected JPsi event, set in cfg file (False for data skim)
-  if (fEtabGoodProb==0 %% !fIsJPsiMuMu) return; //return if no good Etab Cand has been found (needs to be taken out for MC maybe)
+//  if (fEtabGoodProb==0 && !fIsJPsiMuMu) return; //return if no good Etab Cand has been found (needs to be taken out for MC maybe)
 
   fTree->Fill();
 }
