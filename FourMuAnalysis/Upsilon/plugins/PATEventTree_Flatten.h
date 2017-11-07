@@ -196,7 +196,7 @@ class PATEventTree : public edm::EDAnalyzer {
   float fMETPhi[METMAX], fMETTheta[METMAX], fMETEta[METMAX], fMETRapidity[METMAX], fMETCharge[METMAX], fMETP[METMAX], fMETPt[METMAX], fMETPx[METMAX], fMETPy[METMAX], fMETPz[METMAX], fMETEnergy[METMAX], fMETEt[METMAX], fMETMass[METMAX], fMETMt[METMAX], fMETVx[METMAX], fMETVy[METMAX], fMETVz[METMAX];
 
   // -- JPsi->MuMu candidates
-  static const int JPsiMAX = 500;
+  static const int JPsiMAX = 1000;
 
   int fJPsiN, fJPsiMuMuN, fJPsiMuTkN, fBaseJPsiI[2];
   int fJPsiIndex[JPsiMAX], fJPsiClosestPVinZ[JPsiMAX], fJPsiMuI[JPsiMAX][2], fJPsiMuCategory[JPsiMAX][2];
@@ -204,11 +204,11 @@ class PATEventTree : public edm::EDAnalyzer {
   bool fJPsiMuCutKin[JPsiMAX][2], fJPsiMuCutHLT[JPsiMAX][2], fJPsiMuCutIso[JPsiMAX][2], fJPsiMuCutSA[JPsiMAX][2], fJPsiMuCutTrk[JPsiMAX][2], fJPsiMuType[JPsiMAX][2][5];
 
   // -- Eta_b->2 J/Psi candidates
-  static const int ETABMAX = 200;
+  static const int ETABMAX = 500;
 
-  int fEtabN, fBaseEtabI;
+  int fEtabN, fBaseEtabI, fEtabGoodProb;
   int fEtabIndex[ETABMAX], fEtabDuplicatesI[ETABMAX], fEtabJPsiI[ETABMAX][2], fEtabMuI[ETABMAX][4], fEtabMuN[ETABMAX], fEtabToRePvI[ETABMAX];
-  float fEtabCharge[ETABMAX], fEtabPhi[ETABMAX], fEtabTheta[ETABMAX], fEtabEta[ETABMAX], fEtabRapidity[ETABMAX], fEtabP[ETABMAX], fEtabPt[ETABMAX], fEtabPx[ETABMAX], fEtabPy[ETABMAX], fEtabPz[ETABMAX], fEtabEnergy[ETABMAX], fEtabEt[ETABMAX], fEtabMass[ETABMAX], fEtabMt[ETABMAX], fEtabChi2[ETABMAX], fEtabNdof[ETABMAX], fEtabVx[ETABMAX], fEtabVy[ETABMAX], fEtabVz[ETABMAX], fEtabVxE[ETABMAX], fEtabVyE[ETABMAX], fEtabVzE[ETABMAX], fEtabVtxPhi[ETABMAX], fEtabVtxTheta[ETABMAX], fEtabVtxEta[ETABMAX], fEtabVtxRapidity[ETABMAX], fEtabVtxP[ETABMAX], fEtabVtxPt[ETABMAX], fEtabVtxPx[ETABMAX], fEtabVtxPy[ETABMAX], fEtabVtxPz[ETABMAX], fEtabVtxEnergy[ETABMAX], fEtabVtxEt[ETABMAX], fEtabVtxMass[ETABMAX], fEtabVtxMt[ETABMAX], fEtabCT[ETABMAX], fEtabCTxy[ETABMAX], fEtabVtxCT[ETABMAX], fEtabVtxCTxy[ETABMAX], fEtabJPsiDeltaL[ETABMAX], fEtabJPsiDeltaT[ETABMAX], fEtabJPsiVtxErr[ETABMAX], fEtabJPsiVtxErrxy[ETABMAX], fEtabJPsiProjX[ETABMAX][2], fEtabJPsiProjY[ETABMAX][2], fEtabJPsiProjZ[ETABMAX][2], fEtabJPsiCT[ETABMAX][2], fEtabJPsiCTxy[ETABMAX][2], fEtabJPsiToPVVtxErr[ETABMAX][2], fEtabJPsiToPVVtxErrxy[ETABMAX][2], fEtabJPsiVtxCT[ETABMAX][2], fEtabJPsiVtxCTxy[ETABMAX][2];
+  float fEtabCharge[ETABMAX], fEtabPhi[ETABMAX], fEtabTheta[ETABMAX], fEtabEta[ETABMAX], fEtabRapidity[ETABMAX], fEtabP[ETABMAX], fEtabPt[ETABMAX], fEtabPx[ETABMAX], fEtabPy[ETABMAX], fEtabPz[ETABMAX], fEtabEnergy[ETABMAX], fEtabEt[ETABMAX], fEtabMass[ETABMAX], fEtabMt[ETABMAX], fEtabChi2[ETABMAX], fEtabNdof[ETABMAX], fEtabProb[ETABMAX], fEtabVx[ETABMAX], fEtabVy[ETABMAX], fEtabVz[ETABMAX], fEtabVxE[ETABMAX], fEtabVyE[ETABMAX], fEtabVzE[ETABMAX], fEtabVtxPhi[ETABMAX], fEtabVtxTheta[ETABMAX], fEtabVtxEta[ETABMAX], fEtabVtxRapidity[ETABMAX], fEtabVtxP[ETABMAX], fEtabVtxPt[ETABMAX], fEtabVtxPx[ETABMAX], fEtabVtxPy[ETABMAX], fEtabVtxPz[ETABMAX], fEtabVtxEnergy[ETABMAX], fEtabVtxEt[ETABMAX], fEtabVtxMass[ETABMAX], fEtabVtxMt[ETABMAX], fEtabCT[ETABMAX], fEtabCTxy[ETABMAX], fEtabVtxCT[ETABMAX], fEtabVtxCTxy[ETABMAX], fEtabJPsiDeltaL[ETABMAX], fEtabJPsiDeltaT[ETABMAX], fEtabJPsiVtxErr[ETABMAX], fEtabJPsiVtxErrxy[ETABMAX], fEtabJPsiProjX[ETABMAX][2], fEtabJPsiProjY[ETABMAX][2], fEtabJPsiProjZ[ETABMAX][2], fEtabJPsiCT[ETABMAX][2], fEtabJPsiCTxy[ETABMAX][2], fEtabJPsiToPVVtxErr[ETABMAX][2], fEtabJPsiToPVVtxErrxy[ETABMAX][2], fEtabJPsiVtxCT[ETABMAX][2], fEtabJPsiVtxCTxy[ETABMAX][2];
   // isolation information
   int fEtabJPsiIsoTkN[ETABMAX][2];
   float fEtabJPsiIso7PV[ETABMAX][2], fEtabJPsiIsoTkCA[ETABMAX][2];

@@ -524,6 +524,7 @@ void PATEventTree::beginJob() {
   fTree->Branch("JPsiMuType",      fJPsiMuType,       "JPsiMuType[JPsiN][2][5]/O");
 
   fTree->Branch("EtabN",        &fEtabN,        "EtabN/I");
+  fTree->Branch("EtabGoodProbN", &fEtabGoodProb, "EtabGoodProbN/I");
   fTree->Branch("EtabIndex",    fEtabIndex,     "EtabIndex[EtabN]/I");
   fTree->Branch("EtabDuplicatesI", fEtabDuplicatesI, "EtabDuplicatesI[EtabN]/I");
   fTree->Branch("EtabCharge",   fEtabCharge,    "EtabCharge[EtabN]/F");
@@ -542,6 +543,7 @@ void PATEventTree::beginJob() {
   fTree->Branch("EtabMt",       fEtabMt,        "EtabMt[EtabN]/F");
   fTree->Branch("EtabChi2",     fEtabChi2,      "EtabChi2[EtabN]/F");
   fTree->Branch("EtabNdof",     fEtabNdof,      "EtabNdof[EtabN]/F");
+  fTree->Branch("EtabProb",     fEtabProb,      "EtabProb[EtabN]/F");
   fTree->Branch("EtabVx",       fEtabVx,        "EtabVx[EtabN]/F");
   fTree->Branch("EtabVy",       fEtabVy,        "EtabVy[EtabN]/F");
   fTree->Branch("EtabVz",       fEtabVz,        "EtabVz[EtabN]/F");
@@ -800,7 +802,7 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   ++nevt; 
   init();
 
-  cout << "Event info" << endl;
+//  cout << "Event info" << endl;
 
   // ----------------------------------------------------------------------
   // -- Event information
@@ -991,7 +993,8 @@ void PATEventTree::analyze(const edm::Event& iEvent,
   // ----------------------------------------------------------------------
 
   fillTopology();
-  if ( fIsJPsiMuMu&&(fJPsiI[0]==-9999&&fJPsiI[1]==-9999) ) return; // return if no MC JPsi found for expected JPsi event
+  if ( fIsJPsiMuMu&&(fJPsiI[0]==-9999&&fJPsiI[1]==-9999) ) return; // return if no MC JPsi found for expected JPsi event, set in cfg file (False for data skim)
+  if (fEtabGoodProb==0 %% !fIsJPsiMuMu) return; //return if no good Etab Cand has been found (needs to be taken out for MC maybe)
 
   fTree->Fill();
 }
@@ -1114,7 +1117,7 @@ void PATEventTree::init() {
     }
   }
 
-  fPvN = fRePvN = fAllPvN = fHLTN = fPcN = fTkN = fMuN = fElecN = fMiscTkN = fPhotN = JtShift = fJtN = fJtStandN = fJtFatN = fJtSubN = fJtFiltN = fMETN = fSvN = fSsvN = fGtvN = fJPsiN = fEtabN = fHN = fGnN = fGnBN = fJtBdRN = fJtBFlavN = 0;
+  fPvN = fRePvN = fAllPvN = fHLTN = fPcN = fTkN = fMuN = fElecN = fMiscTkN = fPhotN = JtShift = fJtN = fJtStandN = fJtFatN = fJtSubN = fJtFiltN = fMETN = fSvN = fSsvN = fGtvN = fJPsiN = fEtabN = fHN = fGnN = fGnBN = fJtBdRN = fJtBFlavN = fEtabGoodProb = 0;
 
 }
 
@@ -2024,7 +2027,7 @@ void PATEventTree::fillJets(const std::vector<pat::Jet>& jets) {
     //fillSecondaryVertices(*jets[i].tagInfoSecondaryVertex("ghostTrackVertex"), true);
     fJtN++;
   }
-  cout << "before rankstuff" << endl;
+//  cout << "before rankstuff" << endl;
   fJtRankTCHE[fJtN] = fJtRankTCHP[fJtN] = fJtRankP[fJtN] = fJtRankBP[fJtN] = fJtRankSSVHE[fJtN] = fJtRankSSVHP[fJtN] = fJtRankCSV[fJtN] = fJtRankCSVMVA[fJtN] = fJtRankGT[fJtN] = fJtRankSE[fJtN] = fJtRankSM[fJtN] = fJtN;
   // 3rd: fill in finalized btag rankings using rank-ordered vectors
   for (int rank = fJtN-JtShift-1; rank >= 0; rank--) {
@@ -2178,7 +2181,7 @@ void PATEventTree::fillMET(const pat::METCollection& METColl) {
 void PATEventTree::fillJPsiMuMuCand(const reco::CompositeCandidateCollection& JPsiCands, const reco::MuonRefVector& goodMuons, std::vector<TransientTrack>& t_tks) {
 
   for(unsigned int ijp = 0; ijp < JPsiCands.size(); ijp++) {
-    if( fJPsiN == JPsiMAX ) break;
+    if( fJPsiN == JPsiMAX ){std::cout << "JPsiMAX reached: " << JPsiMAX << std::endl; break;}
     //if( JPsiCands[fJPsiN].mass()<2.0 || JPsiCands[fJPsiN].mass()>4.0 ) continue; // only consider candidates within a loose J/Psi mass window
 
     fJPsiIndex[fJPsiN] = fJPsiN;
@@ -2405,12 +2408,15 @@ void PATEventTree::makeJPsiMuTkCand(const reco::MuonRefVector& goodMuons, const 
 void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
 
   for(int ijp1 = 0; ijp1 < fJPsiMuMuN-1; ijp1++) {
-    if( fEtabN == ETABMAX ) break;
+    if( fEtabN == ETABMAX ) {std::cout << "ETABMAX Reached: " << fEtabN << std::endl; break;}
 
     for(int ijp2 = ijp1+1; ijp2 < fJPsiMuMuN; ijp2++) {
-      if( fEtabN == ETABMAX ) break;
+      if( fEtabN == ETABMAX ) {std::cout << "ETABMAX Reached: " << fEtabN << std::endl; break;}
+
       if( fJPsiMuI[ijp1][0]==-9999 || fJPsiMuI[ijp1][1]==-9999 || fJPsiMuI[ijp2][0]==-9999 || fJPsiMuI[ijp2][1]==-9999 ) continue; // only consider muons we can find
+      if( fMuIsSoft[fJPsiMuI[ijp1][0]]==false || fMuIsSoft[fJPsiMuI[ijp1][1]]==false || fMuIsSoft[fJPsiMuI[ijp2][0]]==false || fMuIsSoft[fJPsiMuI[ijp2][1]]==false ) continue; // only use soft muons
       if( fJPsiMuI[ijp1][0]==fJPsiMuI[ijp2][0] || fJPsiMuI[ijp1][0]==fJPsiMuI[ijp2][1] || fJPsiMuI[ijp1][1]==fJPsiMuI[ijp2][0] || fJPsiMuI[ijp1][1]==fJPsiMuI[ijp2][1] ) continue; // no sharing muons b/t J/Psi cands
+      if( fJPsiMass[ijp1] < 2.8 || fJPsiMass[ijp1] > 3.35 || fJPsiMass[ijp2] < 2.8 || fJPsiMass[ijp2] > 3.35) continue; //Only want to consider Etab with JPsiMass in window
 
       float ze1 = fJPsiEnergy[ijp1], zpx1 = fJPsiPx[ijp1], zpy1 = fJPsiPy[ijp1], zpz1 = fJPsiPz[ijp1], ze2 = fJPsiEnergy[ijp2], zpx2 = fJPsiPx[ijp2], zpy2 = fJPsiPy[ijp2], zpz2 = fJPsiPz[ijp2];
       float etabe = ze1+ze2, etabpx = zpx1+zpx2, etabpy = zpy1+zpy2, etabpz = zpz1+zpz2;
@@ -2475,6 +2481,7 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
           const math::XYZTLorentzVectorD etab_mom = etab_vtx.p4(0.1056583,0.0);
           fEtabChi2[fEtabN]     = (float) etab_vtx.chi2();
           fEtabNdof[fEtabN]     = (float) etab_vtx.ndof();
+          fEtabProb[fEtabN]     = (float) TMath::Prob(etab_vtx.chi2(),etab_vtx.ndof());
           fEtabVx[fEtabN]       = (float) etab_vtx.x();
           fEtabVy[fEtabN]       = (float) etab_vtx.y();
           fEtabVz[fEtabN]       = (float) etab_vtx.z();
@@ -2496,7 +2503,9 @@ void PATEventTree::makeEtabCand(std::vector<TransientTrack>& t_tks) {
           fEtabVtxRapidity[fEtabN]=(float) etab_mom.Rapidity();
         }
       }
-
+      //ensure event has good EtabCand (needed for 2016 because Etab Reco Pileup)
+      if (fEtabChi2[fEtabN]!=-9999 && fEtabProb[fEtabN]>0.0) fEtabGoodProb++;
+      
       // find Eta_b from best J/Psi candidates
       if ( (fBaseJPsiI[0]==ijp1&&fBaseJPsiI[1]==ijp2) || (fBaseJPsiI[1]==ijp1&&fBaseJPsiI[1]==ijp2) ) fBaseEtabI=fEtabN;
 
